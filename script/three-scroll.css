@@ -1,7 +1,10 @@
 @import url("./style-master.css");
 
 body {
-    background-color: rgb(111, 14, 76);
+    /* background-color: rgb(111, 14, 76); */
+
+    background: radial-gradient(black, #220134);
+    background-attachment: fixed;
   
     color: rgb(255, 238, 0);
     font-family: sans-serif;
