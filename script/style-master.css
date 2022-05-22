@@ -1,0 +1,22 @@
+* {
+    margin:0;
+    padding:0;
+}
+
+body {
+    font-size: 1.25vw;
+    background-color: rgb(46, 46, 46);
+}
+
+.section {
+    width: 100%;
+    height: auto;
+}
+
+.container {
+    width: 100%;
+}
+
+.is--fullpage {
+    height: 100vh;
+}
