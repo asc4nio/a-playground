@@ -1,11 +1,14 @@
 * {
-    margin:0;
-    padding:0;
+    margin: 0;
+    padding: 0;
 }
 
 body {
+    font-family: sans-serif;
     font-size: 1.25vw;
-    background-color: rgb(46, 46, 46);
+
+    color: rgb(255, 255, 255);
+    background-color: rgb(0, 0, 0);
 }
 
 .section {
@@ -15,8 +18,38 @@ body {
 
 .container {
     width: 100%;
+    padding: 2em;
+}
+
+.button {
+    padding: 1em;
+    margin: 1em;
+
+    border-style: solid;
+    border-width: 1px;
+    border-color: rgb(255, 255, 255);
+    border-radius: 10em;
+}
+.button:hover{
+    background-color: rgba(255, 255, 255,0.33);
+}
+
+a {
+    text-decoration: none;
+    color: rgb(255, 255, 255);
+}
+a {
+    text-decoration: none;
+}
+
+.is--hidden {
+    display: none !important;
 }
 
 .is--fullpage {
     height: 100vh;
+}
+
+.is--flexbox {
+    display: flex;
 }
