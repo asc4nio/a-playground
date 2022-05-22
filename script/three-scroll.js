@@ -138,11 +138,11 @@ renderer.setSize(threeContSize.w, threeContSize.h);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
 // Controls //
-/*
-const controls = new THREE.TrackballControls( camera, renderer.domElement );
-controls.enableDamping = true;
-controls.dampingFactor = 0.1;
-*/
+
+// const controls = new THREE.TrackballControls( camera, renderer.domElement );
+// controls.enableDamping = true;
+// controls.dampingFactor = 0.1;
+
 
 // Debug //
 // scene.add(new THREE.AxesHelper(1));
@@ -185,7 +185,7 @@ const tick = () => {
   starGroup.rotation.y += 0.001;
 
   // Update controls
-  //controls.update();
+  // controls.update();
 
   // Render
   renderer.render(scene, camera);
