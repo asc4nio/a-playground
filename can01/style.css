@@ -27,9 +27,9 @@ body {
   .trigger{
     position: absolute;
 
-    width: 4em;
-    height: 4em;
-    background-color: white;
+    width: 3em;
+    height: 3em;
+    background-color: rgb(255, 238, 0);
 
     display: flex;
     justify-content: center;
@@ -39,12 +39,12 @@ body {
 
     pointer-events: initial;
 
-    transform: scale(0,0);
-    transition: transform 0.2s;
+    opacity:0;
+    transition: opacity 0.2s;
   }
 
   .trigger.is--visible{
-    transform: scale(1,1);
+    opacity:1
   }
 
   /* .three-container{} */

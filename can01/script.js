@@ -7,7 +7,17 @@ import { RGBELoader } from '../three.js/examples/jsm/loaders//RGBELoader.js';
 let camera, scene, renderer;
 let group, cubes;
 
-let triggers
+let controls
+
+const triggers = [{
+    position: new THREE.Vector3(0,0.4,0.1),
+    element: document.querySelector('#trigger-01')
+},{
+    position: new THREE.Vector3(0,0,-0.25),
+    element: document.querySelector('#trigger-02')
+}]
+
+const raycaster = new THREE.Raycaster();
 
 init();
 animate();
@@ -48,7 +58,7 @@ function init() {
     } );
 
     // helper
-    scene.add(new THREE.GridHelper(4, 12, 0x888888, 0x444444));
+    // scene.add(new THREE.GridHelper(4, 12, 0x888888, 0x444444));
 
     /*
     const material = new THREE.MeshBasicMaterial({ color: 0xffffff });
@@ -70,7 +80,7 @@ function init() {
 
     container.appendChild(renderer.domElement);
 
-    const controls = new OrbitControls( camera, renderer.domElement );
+    controls = new OrbitControls( camera, renderer.domElement );
     controls.minDistance = 0.75;
     controls.maxDistance = 5;
     
@@ -81,18 +91,21 @@ function init() {
     controls.minPolarAngle = Math.PI*0.25
     controls.maxPolarAngle = Math.PI*0.75
 
+    controls.enableDamping = true
+    controls.dampingFactor = 0.025
+
     // controls.target.set( 0, 0, - 0.2 );
     controls.update();
 
-    triggers = [{
-        position: new THREE.Vector3(0,0.4,0.1),
-        element: document.querySelector('#trigger-01')
-    },{
-        position: new THREE.Vector3(0,0,-0.15),
-        element: document.querySelector('#trigger-02')
-    }]
-    console.log(triggers)
+    // triggers = [{
+    //     position: new THREE.Vector3(0,0.4,0.1),
+    //     element: document.querySelector('#trigger-01')
+    // },{
+    //     position: new THREE.Vector3(0,0,-0.15),
+    //     element: document.querySelector('#trigger-02')
+    // }]
 
+    // raycaster = new Raycaster()
 }
 
 function onWindowResize() {
@@ -105,6 +118,8 @@ function onWindowResize() {
 }
 
 function animate() {
+    controls.update();
+
 
     // group.rotation.y = performance.now() / 3000;
 
@@ -112,18 +127,22 @@ function animate() {
         const screenPosition = trigger.position.clone()
         screenPosition.project(camera)
 
-        // console.log(screenPosition)
-
         const translateX = screenPosition.x* innerWidth * 0.5
         const translateY = screenPosition.y* innerHeight * -0.5
 
-        // console.log(translateX)
+        console.log(trigger.element.style)
 
-        trigger.element.style.transform = `translateX(${translateX}px) translateY(${translateY}px)`
+        trigger.element.style.transform = `translate( ${translateX}px, ${translateY}px)`
 
-        // console.log(trigger)
+        raycaster.setFromCamera(screenPosition,camera)
+        const intersects = raycaster.intersectObjects(scene.children)
 
-        
+
+        if(intersects.length === 0){
+            trigger.element.classList.add('is--visible')
+        } else {
+            trigger.element.classList.remove('is--visible')
+        }
 
     }
 
