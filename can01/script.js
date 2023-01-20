@@ -1,5 +1,3 @@
-
-
 import * as THREE from 'three';
 
 import { OrbitControls } from '../three.js/examples/jsm/controls/OrbitControls.js';
@@ -84,10 +82,6 @@ function init() {
 
     // controls.target.set( 0, 0, - 0.2 );
     controls.update();
-
-    // EVENTS
-
-    
 
 }
 

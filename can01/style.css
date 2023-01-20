@@ -1,6 +1,36 @@
 body {
     margin: 0px;
     background-color: rgb(240,240,240);
+    font-size: 1vw;
     font-family: arial, sans-serif;
   }
-  
+
+  p{}
+  .ui{
+    position: absolute;
+
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    pointer-events: none;
+  }
+  .trigger{
+    width: 4em;
+    height: 4em;
+    background-color: white;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    border-radius: 2em;
+
+    pointer-events: initial;
+  }
+  .three-container{}
