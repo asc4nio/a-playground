@@ -36,7 +36,7 @@ function init() {
 
         texture.mapping = THREE.EquirectangularReflectionMapping;
 
-        // scene.background = texture;
+        scene.background = texture;
         scene.environment = texture;
 
         // render();
@@ -64,7 +64,7 @@ function init() {
     // group = new THREE.Group();
     // scene.add(group);
 
-    scene.add(new THREE.GridHelper(4, 12, 0x888888, 0x444444));
+    // scene.add(new THREE.GridHelper(4, 12, 0x888888, 0x444444));
 
     // const material = new THREE.MeshBasicMaterial({ color: 0xffffff });
     // const geometry = new THREE.PlaneGeometry(1, 1, 1, 1);
