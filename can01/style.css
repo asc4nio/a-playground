@@ -3,9 +3,11 @@ body {
     background-color: rgb(240,240,240);
     font-size: 1vw;
     font-family: arial, sans-serif;
+
+    /* position: relative; */
   }
 
-  p{}
+  /* p{} */
   .ui{
     position: absolute;
 
@@ -19,8 +21,12 @@ body {
     align-items: center;
 
     pointer-events: none;
+
   }
+
   .trigger{
+    position: absolute;
+
     width: 4em;
     height: 4em;
     background-color: white;
@@ -32,5 +38,13 @@ body {
     border-radius: 2em;
 
     pointer-events: initial;
+
+    transform: scale(0,0);
+    transition: transform 0.2s;
   }
-  .three-container{}
+
+  .trigger.is--visible{
+    transform: scale(1,1);
+  }
+
+  /* .three-container{} */

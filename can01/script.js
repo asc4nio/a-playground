@@ -7,6 +7,8 @@ import { RGBELoader } from '../three.js/examples/jsm/loaders//RGBELoader.js';
 let camera, scene, renderer;
 let group, cubes;
 
+let triggers
+
 init();
 animate();
 
@@ -19,7 +21,7 @@ function init() {
 
     // CAMERA
     camera = new THREE.PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 0.25, 20 );
-    camera.position.set( 0, 0.5,-2 );
+    camera.position.set( -2, 0.5, 0 );
     // camera.lookAt(0, 0, 0);
 
 
@@ -44,7 +46,6 @@ function init() {
         } );
 
     } );
-
 
     // helper
     scene.add(new THREE.GridHelper(4, 12, 0x888888, 0x444444));
@@ -73,7 +74,7 @@ function init() {
     controls.minDistance = 0.75;
     controls.maxDistance = 5;
     
-    controls.enablePan = false
+    // controls.enablePan = false
     controls.enableZoom = false
 
     // fix vertical rotation
@@ -82,6 +83,12 @@ function init() {
 
     // controls.target.set( 0, 0, - 0.2 );
     controls.update();
+
+    triggers = [{
+        position: new THREE.Vector3(0,0,0),
+        element: document.querySelector('.trigger')
+    }]
+    console.log(triggers)
 
 }
 
@@ -97,6 +104,25 @@ function onWindowResize() {
 function animate() {
 
     // group.rotation.y = performance.now() / 3000;
+
+    for(const trigger of triggers){
+        const screenPosition = trigger.position.clone()
+        screenPosition.project(camera)
+
+        // console.log(screenPosition)
+
+        const translateX = screenPosition.x* innerWidth * 0.5
+        const translateY = screenPosition.y* innerHeight * -0.5
+
+        // console.log(translateX)
+
+        trigger.element.style.transform = `translateX(${translateX}px) translateY(${translateY}px)`
+
+        // console.log(trigger)
+
+        
+
+    }
 
     renderer.render(scene, camera);
 
