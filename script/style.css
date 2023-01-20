@@ -1,5 +1,3 @@
-/* Applies to the entire body of the HTML document (except where overridden by more specific
-selectors). */
 body {
   margin: 0px;
   background-color: rgb(240,240,240);

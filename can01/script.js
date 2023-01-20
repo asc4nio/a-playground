@@ -16,63 +16,48 @@ animate();
 function init() {
 
     const container = document.createElement('div');
+    container.className = "three-container"
     document.body.appendChild(container);
 
     // CAMERA
-
-    // camera = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 1, 1500);
-    // camera.position.set(0, 0, 5);
+    camera = new THREE.PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 0.25, 20 );
+    camera.position.set( 0, 0.5,-2 );
     // camera.lookAt(0, 0, 0);
-    camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 20 );
-    camera.position.set( 0,1,-2 );
+
 
     // SCENE
-
     scene = new THREE.Scene();
 
     new RGBELoader()
     .setPath( 'asset/' )
     .load( 'hdri01.hdr', function ( texture ) {
-
         texture.mapping = THREE.EquirectangularReflectionMapping;
 
         scene.background = texture;
         scene.environment = texture;
 
-        // render();
-
         // model
-
         const loader = new GLTFLoader().setPath( 'asset/' );
         loader.load( 'can01.glb', function ( gltf ) {
-
-            // scene.add( gltf.scene );
-
             gltf.scene.scale.set(0.01, 0.01, 0.01); 
             gltf.scene.position.set(0,-0.45,0); 
-        const root = gltf.scene;
-        scene.add(root);
 
-            // render();
-
+            scene.add( gltf.scene );
         } );
 
     } );
 
-    //
 
-    // group = new THREE.Group();
-    // scene.add(group);
+    // helper
+    scene.add(new THREE.GridHelper(4, 12, 0x888888, 0x444444));
 
-    // scene.add(new THREE.GridHelper(4, 12, 0x888888, 0x444444));
-
-    // const material = new THREE.MeshBasicMaterial({ color: 0xffffff });
-    // const geometry = new THREE.PlaneGeometry(1, 1, 1, 1);
-    // const plane = new THREE.Mesh(geometry, material);
-
-    // plane.position.set(0, 0, 0)
-
-    // scene.add(plane);
+    /*
+    const material = new THREE.MeshBasicMaterial({ color: 0xffffff });
+    const geometry = new THREE.PlaneGeometry(1, 1, 1, 1);
+    const plane = new THREE.Mesh(geometry, material);
+    plane.position.set(0, 0, 0)
+    scene.add(plane);
+    */
 
     // RENDERER
 
@@ -87,9 +72,16 @@ function init() {
     container.appendChild(renderer.domElement);
 
     const controls = new OrbitControls( camera, renderer.domElement );
-    // controls.addEventListener( 'change', render ); // use if there is no animation loop
-    controls.minDistance = 2;
-    controls.maxDistance = 10;
+    controls.minDistance = 0.75;
+    controls.maxDistance = 5;
+    
+    controls.enablePan = false
+    controls.enableZoom = false
+
+    // fix vertical rotation
+    controls.minPolarAngle = Math.PI*0.25
+    controls.maxPolarAngle = Math.PI*0.75
+
     // controls.target.set( 0, 0, - 0.2 );
     controls.update();
 
