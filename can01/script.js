@@ -75,7 +75,7 @@ function init() {
     controls.maxDistance = 5;
     
     // controls.enablePan = false
-    controls.enableZoom = false
+    // controls.enableZoom = false
 
     // fix vertical rotation
     controls.minPolarAngle = Math.PI*0.25
@@ -85,8 +85,11 @@ function init() {
     controls.update();
 
     triggers = [{
-        position: new THREE.Vector3(0,0,0),
-        element: document.querySelector('.trigger')
+        position: new THREE.Vector3(0,0.4,0.1),
+        element: document.querySelector('#trigger-01')
+    },{
+        position: new THREE.Vector3(0,0,-0.15),
+        element: document.querySelector('#trigger-02')
     }]
     console.log(triggers)
 
