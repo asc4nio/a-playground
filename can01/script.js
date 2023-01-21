@@ -84,15 +84,6 @@ function init() {
     // controls.target.set( 0, 0, - 0.2 );
     controls.update();
 
-    // triggers = [{
-    //     position: new THREE.Vector3(0,0.4,0.1),
-    //     element: document.querySelector('#trigger-01')
-    // },{
-    //     position: new THREE.Vector3(0,0,-0.15),
-    //     element: document.querySelector('#trigger-02')
-    // }]
-
-    // raycaster = new Raycaster()
 }
 
 function onWindowResize() {
@@ -107,17 +98,12 @@ function onWindowResize() {
 function animate() {
     controls.update();
 
-
-    // group.rotation.y = performance.now() / 3000;
-
     for(const trigger of triggers){
         const screenPosition = trigger.position.clone()
         screenPosition.project(camera)
 
         const translateX = screenPosition.x* innerWidth * 0.5
         const translateY = screenPosition.y* innerHeight * -0.5
-
-        // console.log(trigger.element.style)
 
         trigger.element.style.transform = `translate( ${translateX}px, ${translateY}px)`
 
