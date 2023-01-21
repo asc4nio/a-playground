@@ -65,7 +65,6 @@ function init() {
 
     window.normalMaterial = new THREE.MeshNormalMaterial({});
 
-
     // CAMERA
     camera = new THREE.PerspectiveCamera(135, window.innerWidth / window.innerHeight, 1, 1500);
     camera.position.set(0, 0, 10);
@@ -88,7 +87,6 @@ function init() {
         controls.dampingFactor = 0.05;
         controls.screenSpacePanning = false;
     }
-
 
     //LOADER
     window.textureLoader = new THREE.TextureLoader();
