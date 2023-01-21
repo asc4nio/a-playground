@@ -25,7 +25,7 @@ function init() {
 
     // CAMERA
     camera = new THREE.PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 0.25, 20 );
-    camera.position.set( -2, 0.5, 0 );
+    camera.position.set( -2, 0.4, 0 );
     // camera.lookAt(0, 0, 0);
 
 
@@ -82,6 +82,10 @@ function init() {
     controls.dampingFactor = 0.025
 
     // controls.target.set( 0, 0, - 0.2 );
+
+    // controls.autoRotate = true
+    // controls.autoRotateSpeed = 1
+
     controls.update();
 
 }
@@ -124,6 +128,16 @@ function animate() {
     requestAnimationFrame(animate);
 
 }
+
+
+for(const trigger of triggers){
+    trigger.element.addEventListener("click", (event) => {
+        event.stopPropagation();
+        console.log(event)
+        }
+    )
+}
+
 
 window.addEventListener('resize', onWindowResize);
 
