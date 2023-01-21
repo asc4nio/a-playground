@@ -7,6 +7,14 @@ body {
     /* position: relative; */
   }
 
+  @media screen and (max-width:1000px) {
+    body {font-size: 2vw;}
+   }
+
+  @media screen and (max-width:500px) {
+    body {font-size: 3vw;}
+   }
+
   /* p{} */
   .ui{
     position: absolute;
@@ -27,8 +35,8 @@ body {
   .trigger{
     position: absolute;
 
-    width: 3em;
-    height: 3em;
+    width: 4em;
+    height: 4em;
     background-color: rgb(255, 238, 0);
 
     display: flex;
@@ -41,6 +49,13 @@ body {
 
     opacity:0;
     transition: opacity 0.2s;
+    transition: background-color 0.2s;
+  }
+
+  .trigger:hover{
+
+    background-color: rgb(255, 255, 255);
+
   }
 
   .trigger.is--visible{
