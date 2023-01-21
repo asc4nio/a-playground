@@ -1,4 +1,7 @@
 import * as THREE from 'three';
+import gsap from "gsap"
+
+// console.log(gsap)
 
 import { OrbitControls } from '../three.js/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from '../three.js/examples/jsm/loaders/GLTFLoader.js';
@@ -9,10 +12,12 @@ const raycaster = new THREE.Raycaster();
 
 const triggers = [{
     position: new THREE.Vector3(0,0.4,0.1),
-    element: document.querySelector('#trigger-01')
+    element: document.querySelector('#trigger-01'),
+    cameraPosition: new THREE.Vector3(-1,1,0),
 },{
     position: new THREE.Vector3(0,0,-0.25),
-    element: document.querySelector('#trigger-02')
+    element: document.querySelector('#trigger-02'),
+    cameraPosition: new THREE.Vector3(-2, 0.4, 0),
 }]
 
 
@@ -133,7 +138,15 @@ function animate() {
 for(const trigger of triggers){
     trigger.element.addEventListener("click", (event) => {
         event.stopPropagation();
-        console.log(event)
+        console.log(trigger.cameraPosition)
+
+        gsap.to(camera.position,{
+            x:trigger.cameraPosition.x,
+            y:trigger.cameraPosition.y,
+            z:trigger.cameraPosition.z,
+            duration:2
+        })
+
         }
     )
 }
