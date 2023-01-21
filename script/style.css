@@ -3,6 +3,8 @@ body {
   background-color: #303030;
   color: #EDEDED;
   font-size: 1vw;
+
+
   line-height: 1;
   /* font-family: arial, sans-serif; */
 
@@ -18,23 +20,29 @@ body {
 p {
   font-size: 1em;
 }
-@media screen and (min-width:2000px) {
-  body {
-    font-size: 0.75vw;
-  }
-}
 
-@media screen and (max-width:1000px) {
+
+/* @media (max-width: 1200px) {
+  body {
+    font-size: 1.5vw;
+  }
+} */
+@media (max-width: 992px) {
   body {
     font-size: 2vw;
   }
 }
-
-@media screen and (max-width:500px) {
+/* @media (max-width: 768px) {
+  body {
+    font-size: 3vw;
+  }
+} */
+@media (max-width: 576px) {
   body {
     font-size: 4vw;
   }
 }
+
 
 /* div, a{
   -webkit-box-shadow:inset 0px 0px 0px 0.5em rgba(,0,0,0.25);
@@ -64,6 +72,9 @@ p {
 .home-links {
   border-radius: 1em;
   background-color: rgb(255, 255, 255);
+  color: #303030;
+  padding: 0;
+  margin: 0;
 }
 .home-link{
   display: block;
