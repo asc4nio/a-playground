@@ -19,7 +19,10 @@ body {
 
 p {
   font-size: 1em;
+  margin: 0;
 }
+
+h1 {margin: 0;}
 
 
 /* @media (max-width: 1200px) {
@@ -57,10 +60,10 @@ p {
 }
 
 
-.home-title {
+.home-head {
   background-color: #4EACAF;
   color: #EDEDED;
-  padding: 1em 2em;
+  padding: 2em 4em;
   border-radius: 1em;
 
   text-transform: uppercase
@@ -79,7 +82,7 @@ p {
 .home-link{
   display: block;
   background-color: #EDEDED;
-  padding: 1em 2em;
+  padding: 2em 4em;
   border-radius: 1em;
 
   text-decoration: none;
