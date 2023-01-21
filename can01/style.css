@@ -18,6 +18,7 @@ body {
   /* p{} */
   .ui{
     position: absolute;
+    overflow: hidden;
 
     left: 0;
     top: 0;
@@ -51,15 +52,31 @@ body {
     transition: opacity 0.2s;
     transition: background-color 0.2s;
   }
-
-  .trigger:hover{
-
-    background-color: rgb(255, 255, 255);
-
-  }
-
   .trigger.is--visible{
     opacity:1
+  }
+
+  .trigger-label {
+    background-color: rgba(255, 255, 255,0.75);
+    padding: 2em;
+    border-radius: 1em;
+
+    position: absolute;
+    left: 4em;
+
+    opacity: 0;
+  }
+  /* #trigger-02 .trigger-label{
+    left: auto;
+    right: 4em;
+  } */
+
+  .trigger:hover{
+    background-color: rgb(255, 255, 255);
+  }
+  .trigger:hover .trigger-label{
+    opacity: 1;
+    white-space: nowrap;
   }
 
   /* .three-container{} */

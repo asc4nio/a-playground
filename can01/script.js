@@ -4,10 +4,8 @@ import { OrbitControls } from '../three.js/examples/jsm/controls/OrbitControls.j
 import { GLTFLoader } from '../three.js/examples/jsm/loaders/GLTFLoader.js';
 import { RGBELoader } from '../three.js/examples/jsm/loaders//RGBELoader.js';
 
-let camera, scene, renderer;
-let group, cubes;
-
-let controls
+let camera, scene, renderer, controls
+const raycaster = new THREE.Raycaster();
 
 const triggers = [{
     position: new THREE.Vector3(0,0.4,0.1),
@@ -17,10 +15,6 @@ const triggers = [{
     element: document.querySelector('#trigger-02')
 }]
 
-const raycaster = new THREE.Raycaster();
-
-init();
-animate();
 
 
 function init() {
@@ -60,13 +54,6 @@ function init() {
     // helper
     // scene.add(new THREE.GridHelper(4, 12, 0x888888, 0x444444));
 
-    /*
-    const material = new THREE.MeshBasicMaterial({ color: 0xffffff });
-    const geometry = new THREE.PlaneGeometry(1, 1, 1, 1);
-    const plane = new THREE.Mesh(geometry, material);
-    plane.position.set(0, 0, 0)
-    scene.add(plane);
-    */
 
     // RENDERER
 
@@ -153,3 +140,7 @@ function animate() {
 }
 
 window.addEventListener('resize', onWindowResize);
+
+
+init();
+animate();
