@@ -25,13 +25,6 @@ function preload() {
   source[5] = loadImage(
     "images/tdh-mobile.png"
   );
-
-  // source[6] = loadImage(
-  //   "images/webclip.png"
-  // );
-  // source[7] = loadImage(
-  //   "images/favicon-white.png"
-  // );
 }
 
 function setStarScale() {
@@ -64,17 +57,12 @@ function draw() {
   normMouse.x = mouseX - innerWidth/2
   normMouse.y = mouseY - innerHeight/2
 
-  push()
-  fill(0,0,255)
-  circle(normMouse.x, normMouse.y, 10)
-  pop()
-
   for(let star of stars){
     star.show()
     star.update()
-
     star.mouseIntersects(normMouse)
 
+    //intersectsOther ?
   }
 }
 
@@ -157,6 +145,8 @@ class Star {
       circle(this.bbP2.x,this.bbP2.y,10)
       fill(255,0,0)
       circle(this.centerPosition.x,this.centerPosition.y,10)
+      fill(0,0,255)
+      circle(normMouse.x, normMouse.y, 10)
     pop()
   }
   mouseIntersects(_v2Input){
