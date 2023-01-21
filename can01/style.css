@@ -15,7 +15,10 @@ body {
     body {font-size: 3vw;}
    }
 
-  /* p{} */
+   p {
+    height: 1em;
+  }
+
   .ui{
     position: absolute;
     overflow: hidden;
@@ -33,11 +36,12 @@ body {
 
   }
 
+
+
   .trigger{
     position: absolute;
 
-    width: 3em;
-    height: 3em;
+    padding: 0.4em 1.2em;
     background-color: rgb(255, 238, 0);
 
     display: flex;
@@ -58,11 +62,11 @@ body {
 
   .trigger-label {
     background-color: rgba(255, 255, 255,0.75);
-    padding: 2em;
+    padding: 0.8em 1.2em;
     border-radius: 1em;
 
     position: absolute;
-    left: 4em;
+    left: 100%;
 
     opacity: 0;
 
@@ -78,6 +82,10 @@ body {
   }
   .trigger:hover .trigger-label{
     opacity: 1;
+  }
+
+  .trigger.is--open {
+    background-color: rgb(255, 255, 255);
   }
 
 
