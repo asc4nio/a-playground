@@ -13,11 +13,11 @@ const raycaster = new THREE.Raycaster();
 const triggers = [{
     position: new THREE.Vector3(0,0.4,0.1),
     element: document.querySelector('#trigger-01'),
-    cameraPosition: new THREE.Vector3(-1,1,0),
+    cameraPosition: new THREE.Vector3(-1.5,1,0),
 },{
     position: new THREE.Vector3(0,0,-0.25),
     element: document.querySelector('#trigger-02'),
-    cameraPosition: new THREE.Vector3(-2, 0.4, 0),
+    cameraPosition: new THREE.Vector3(-3, 0.4, 0),
 }]
 
 
@@ -140,11 +140,19 @@ for(const trigger of triggers){
         event.stopPropagation();
         console.log(trigger.cameraPosition)
 
+        let allTriggers = document.querySelectorAll('.trigger')
+        allTriggers.forEach((element) => {
+            element.classList.remove('is--open')
+          });
+
+        trigger.element.classList.add('is--open')
+
         gsap.to(camera.position,{
             x:trigger.cameraPosition.x,
             y:trigger.cameraPosition.y,
             z:trigger.cameraPosition.z,
-            duration:2
+            duration:1.6,
+            ease : 'Power2.easeInOut'
         })
 
         }

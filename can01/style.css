@@ -36,8 +36,8 @@ body {
   .trigger{
     position: absolute;
 
-    width: 4em;
-    height: 4em;
+    width: 3em;
+    height: 3em;
     background-color: rgb(255, 238, 0);
 
     display: flex;
@@ -65,6 +65,8 @@ body {
     left: 4em;
 
     opacity: 0;
+
+    white-space: nowrap;
   }
   /* #trigger-02 .trigger-label{
     left: auto;
@@ -76,7 +78,11 @@ body {
   }
   .trigger:hover .trigger-label{
     opacity: 1;
-    white-space: nowrap;
+  }
+
+
+  .trigger.is--open .trigger-label{
+    opacity:1
   }
 
   /* .three-container{} */
