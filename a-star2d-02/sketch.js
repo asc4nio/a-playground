@@ -1,6 +1,8 @@
 let stars = [];
 let source = [];
 
+let normMouse
+
 let starScale;
 const quantityMult = 1;
 
@@ -23,6 +25,7 @@ function preload() {
   source[5] = loadImage(
     "images/tdh-mobile.png"
   );
+
   // source[6] = loadImage(
   //   "images/webclip.png"
   // );
@@ -42,15 +45,14 @@ function setStarScale() {
 }
 
 function setup() {
-  // rectMode(CENTER);
-  frameRate(60);
   createCanvas(windowWidth, windowHeight);
+
+  normMouse = createVector()
   
   for (let i = 0; i < source.length * quantityMult; i++) {
     stars.push(new Star());
   }
   setStarScale();
-  // console.log(windowWidth, windowHeight, starScale);
 }
 
 function draw() {
@@ -59,34 +61,20 @@ function draw() {
 
   translate(width / 2, height / 2);
 
-
-
-  let transMouseX = mouseX - innerWidth/2
-  let transMouseY = mouseY - innerHeight/2
+  normMouse.x = mouseX - innerWidth/2
+  normMouse.y = mouseY - innerHeight/2
 
   push()
   fill(0,0,255)
-  circle(transMouseX, transMouseY, 10)
+  circle(normMouse.x, normMouse.y, 10)
   pop()
 
   for(let star of stars){
     star.show()
     star.update()
 
+    star.mouseIntersects(normMouse)
 
-
-
-    if(transMouseX > star.bbp1.x &&
-      transMouseX < star.bbp2.x &&
-      transMouseY > star.bbp1.y &&
-      transMouseY < star.bbp2.y
-      ){
-console.log('intersection')
-    } else {
-      // console.log('no intersection')
-    }
-
-    // console.log(star)
   }
 }
 
@@ -98,8 +86,10 @@ class Star {
     this.increment = random(0.0005, 0.002);
     this.index = floor(random(source.length));
 
-    this.bbp1 = createVector()
-    this.bbp2 = createVector()
+    this.centerPosition = createVector()
+
+    this.bbP1 = createVector()
+    this.bbP2 = createVector()
 
   }
   show() {
@@ -141,6 +131,18 @@ class Star {
   update() {
     this.scale += this.increment;
 
+    // collision variables
+    this.bbP1.x = this.x
+    this.bbP1.y = this.y
+    this.bbP2.x = this.x + (source[this.index].width * starScale)
+    this.bbP2.y = this.y + (source[this.index].height * starScale)
+    this.bbP1.mult(this.scale)
+    this.bbP2.mult(this.scale)
+
+    this.centerPosition.x = (this.bbP1.x+this.bbP2.x)/2
+    this.centerPosition.y = (this.bbP1.y+this.bbP2.y)/2
+
+    // reset cycle
     if (this.scale > 1) {
       this.index = floor(random(source.length));
       this.scale = 0;
@@ -148,22 +150,26 @@ class Star {
       this.y = random(-height, height);
     }
 
-    this.bbp1.x = this.x
-    this.bbp1.y = this.y
-
-    this.bbp2.x = this.x + (source[this.index].width * starScale)
-    this.bbp2.y = this.y + (source[this.index].height * starScale)
-
-    this.bbp1.mult(this.scale)
-    this.bbp2.mult(this.scale)
-
+    // debug BB
     push()
-    fill(0,255,0)
-
-    circle(this.bbp1.x,this.bbp1.y,10)
-    circle(this.bbp2.x,this.bbp2.y,10)
-
+      fill(0,255,0)
+      circle(this.bbP1.x,this.bbP1.y,10)
+      circle(this.bbP2.x,this.bbP2.y,10)
+      fill(255,0,0)
+      circle(this.centerPosition.x,this.centerPosition.y,10)
     pop()
+  }
+  mouseIntersects(_v2Input){
+
+    if(_v2Input.x > this.bbP1.x &&
+      _v2Input.x < this.bbP2.x &&
+      _v2Input.y > this.bbP1.y &&
+      _v2Input.y < this.bbP2.y
+      ){
+console.log('intersection')
+    } else {
+      // console.log('no intersection')
+    }
 
   }
 
