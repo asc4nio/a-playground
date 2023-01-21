@@ -1,10 +1,10 @@
 import * as THREE from "three";
 
-import { BoxLineGeometry } from "../three.js/examples/jsm/geometries/BoxLineGeometry.js";
-import { OBJLoader } from "../three.js/examples/jsm/loaders/OBJLoader.js";
+import { BoxLineGeometry } from "../lib/three.js/examples/jsm/geometries/BoxLineGeometry.js";
+import { OBJLoader } from "../lib/three.js/examples/jsm/loaders/OBJLoader.js";
 
-import { VRButton } from "../three.js/examples/jsm/webxr/VRButton.js";
-import { XRControllerModelFactory } from "../three.js/examples/jsm/webxr/XRControllerModelFactory.js";
+import { VRButton } from "../lib/three.js/examples/jsm/webxr/VRButton.js";
+import { XRControllerModelFactory } from "../lib/three.js/examples/jsm/webxr/XRControllerModelFactory.js";
 
 let camera, scene, raycaster, renderer;
 let controller1, controller2;

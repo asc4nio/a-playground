@@ -3,9 +3,9 @@ import gsap from "gsap"
 
 // console.log(gsap)
 
-import { OrbitControls } from '../three.js/examples/jsm/controls/OrbitControls.js';
-import { GLTFLoader } from '../three.js/examples/jsm/loaders/GLTFLoader.js';
-import { RGBELoader } from '../three.js/examples/jsm/loaders//RGBELoader.js';
+import { OrbitControls } from '../lib/three.js/examples/jsm/controls/OrbitControls.js';
+import { GLTFLoader } from '../lib/three.js/examples/jsm/loaders/GLTFLoader.js';
+import { RGBELoader } from '../lib/three.js/examples/jsm/loaders//RGBELoader.js';
 
 let camera, scene, renderer, controls
 const raycaster = new THREE.Raycaster();

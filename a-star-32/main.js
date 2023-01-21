@@ -1,8 +1,8 @@
 import * as THREE from 'three';
 // import Stats from '../three.js/addons/libs/stats.module.js';
 
-import { OrbitControls } from '../three.js/examples/jsm//controls/OrbitControls.js';
-import { OBJLoader } from '../three.js/examples/jsm//loaders/OBJLoader.js';
+import { OrbitControls } from '../lib/three.js/examples/jsm//controls/OrbitControls.js';
+import { OBJLoader } from '../lib/three.js/examples/jsm//loaders/OBJLoader.js';
 
 import Star from './modules/star.js'
 import Star2 from './modules/star2.js'
