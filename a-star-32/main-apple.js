@@ -11,7 +11,7 @@ import Deco from './modules/deco.js'
 
 import addSkyGradient from './modules/skyGradient.js'
 
-import {backgroundGrid, polarGrid, getRandomArbitrary, getRandomInt, chooseStar} from './modules/utility.js'
+import { backgroundGrid, polarGrid, getRandomArbitrary, getRandomInt, chooseStar } from './modules/utility.js'
 
 // import * as dat from '../../external/dat.gui-master/build/dat.gui.module.js'
 // const gui = new dat.GUI()
@@ -53,8 +53,8 @@ starContent[1] = {
 const starsQuantity = 6
 
 var debugFunctions = {
-    isOrbitControl : true,
-    isPointerCameraControl : false
+    isOrbitControl: true,
+    isPointerCameraControl: false
 }
 // gui.add(debugFunctions, 'isPointerCameraControl')
 
@@ -142,33 +142,34 @@ function init() {
     container.appendChild(renderer.domElement);
 
     // EVENTS
+    
+        for (let i = 0; i < starsQuantity; i++) {
+            stars[i] = new Star(scene,camera)
+            stars[i].set(scene)
+    
+            console.log(stars[i])
+        }
+    
+        for (let i = 0; i < 10; i++) {
+            fasci[i] = new Fascio()
+            fasci[i].set(scene)
+        }
+    
+        
 
-    for (let i = 0; i < starsQuantity; i++) {
-        stars[i] = new Star(scene,camera)
-        stars[i].set(scene)
 
-        console.log(stars[i])
+    decos[0] = new Deco('images/decoObj01.obj')
+    decos[1] = new Deco('images/new-a.obj')
+    decos[2] = new Deco('images/decoObj01.obj')
+    decos[3] = new Deco('images/new-a.obj')
+
+
+    for (let deco of decos){
+       scene.add(deco)
     }
 
-    for (let i = 0; i < 10; i++) {
-        fasci[i] = new Fascio()
-        fasci[i].set(scene)
-    }
 
-
-    // decos[0] = new Deco('images/decoObj01.obj')
-    // decos[1] = new Deco('images/new-a.obj')
-    // decos[2] = new Deco('images/decoObj01.obj')
-    // decos[3] = new Deco('images/new-a.obj')
-
-
-    // for (let deco of decos){
-    //     scene.add(deco)
-    // }
-
- 
-        tick();
-        collisionTick()
+tick()
 
 
 }
@@ -188,15 +189,16 @@ function tick() {
     }
 
 
+
     raycaster.setFromCamera(pointer, camera);
 
-        for (let star of stars) {
-        star.update(camera,scene)
+    for (let star of stars) {
+        star.update(camera, scene)
     }
 
 
     for (let star of stars) {
-        star.update(camera,scene)
+        star.update(camera, scene)
     }
 
     for (let fascio of fasci) {
@@ -204,7 +206,7 @@ function tick() {
 
         let overlapping = false
         for (let star of stars) {
-            if (fascio.intersects(star,camera)) {
+            if (fascio.intersects(star, camera)) {
                 overlapping = true
             }
         }
@@ -216,7 +218,7 @@ function tick() {
 
 
 
-    for (let deco of decos){
+    for (let deco of decos) {
         deco.update()
     }
 
@@ -230,16 +232,16 @@ function collisionTick() {
     for (let star of stars) {
         let overlapping = false
         for (let other of stars) {
-            if (star !== other && star.intersects(other)){
-                 overlapping = true
+            if (star !== other && star.intersects(other)) {
+                overlapping = true
             }
         }
         if (overlapping) {
             console.log('overlapping')
             star.fadeOut()
 
-        } 
-        else{
+        }
+        else {
             star.fadeIn()
             starsSpeedIncrement = 1
         }
@@ -272,7 +274,7 @@ function onPointerMove(event) {
     pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
     pointer.y = - (event.clientY / window.innerHeight) * 2 + 1;
 
-    if(debugFunctions.isPointerCameraControl){
+    if (debugFunctions.isPointerCameraControl) {
         camera.position.x = THREE.MathUtils.lerp(-camXMoveRange, camXMoveRange, event.x / window.innerWidth)
         camera.position.y = THREE.MathUtils.lerp(camYMoveRange, -camYMoveRange, event.y / window.innerHeight)
     }
@@ -294,7 +296,7 @@ function onPointerMove(event) {
 
 init();
 
-/*
+
 // wait until DOM is ready
 document.addEventListener("DOMContentLoaded", function (event) {
     console.log('DOMContentLoaded')
@@ -306,7 +308,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
         console.log('window.onload')
 
         tick();
-        collisionTick()
+        //collisionTick()
 
         console.log('tick()')
 
@@ -321,4 +323,3 @@ document.addEventListener("DOMContentLoaded", function (event) {
     };
 
 });
-*/
