@@ -16,7 +16,7 @@ class Star {
             xPosRange: 5,
             yPosRange: 5,
             zPosMin: -25,
-            zPosMax: -50,
+            zPosMax: -75,
         }
         this.end = {
             zDeadPos: -3, // last fadeOut z Position
@@ -33,10 +33,10 @@ class Star {
 
         this.destroyRadius
 
-        this.zSpeed = getRandomArbitrary(0.01, 0.025)*2
+        this.zSpeed = getRandomArbitrary(0.01, 0.025)*3
 
         this.debug = {
-            debugCollision: true,
+            debugCollision: false,
             watchCamera: true,
             midPanel: false,
             matBBColor: 0xFFFF00,
