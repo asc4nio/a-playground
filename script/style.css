@@ -1,6 +1,54 @@
 body {
   margin: 0px;
-  background-color: rgb(240,240,240);
+  background-color: rgb(46, 46, 46);
+  font-size: 1vw;
+  line-height: 1;
   font-family: arial, sans-serif;
+
+  /* text-transform: uppercase */
 }
 
+p {
+  font-size: 1em;
+}
+
+@media screen and (max-width:1000px) {
+  body {
+    font-size: 2vw;
+  }
+}
+
+@media screen and (max-width:500px) {
+  body {
+    font-size: 3vw;
+  }
+}
+
+
+.home-title {
+  background-color: yellow;
+  padding: 1em 2em;
+  border-radius: 1em;
+}
+.home-links {
+  border-radius: 1em;
+  background-color: rgb(145, 145, 145);
+}
+.home-link{
+  display: block;
+  background-color: rgb(223, 223, 223);
+  padding: 1em 2em;
+  border-radius: 1em;
+
+  text-decoration: none;
+  color: black;
+}
+
+.home-link:hover{
+  background-color: rgb(255, 255, 255);
+}
+
+.home-link-text {
+  font-size: 1em;
+  line-height: 0;
+}
