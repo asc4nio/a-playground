@@ -167,8 +167,7 @@ function init() {
     // }
 
  
-        tick();
-        collisionTick()
+
 
 
 }
@@ -294,7 +293,7 @@ function onPointerMove(event) {
 
 init();
 
-/*
+
 // wait until DOM is ready
 document.addEventListener("DOMContentLoaded", function (event) {
     console.log('DOMContentLoaded')
@@ -321,4 +320,3 @@ document.addEventListener("DOMContentLoaded", function (event) {
     };
 
 });
-*/
