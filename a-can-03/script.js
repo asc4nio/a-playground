@@ -65,7 +65,9 @@ function init() {
 
     // MODEL
     const loader = new GLTFLoader().setPath('asset/');
+
     loader.load('can03.glb', function (gltf) {
+
         // console.log(gltf)
         // console.log(gltf.scene.children[0])
 
@@ -82,6 +84,7 @@ function init() {
         // scene.add(gltf.scene);
 
         canObj.children[0].visible = false
+
         
         scene.add(canObj);
         console.log(canObj)
@@ -186,6 +189,7 @@ function animate() {
 
 function setGui() {
     // console.log(canObj)
+
     let donutMesh = canObj.children[2].children[0]
     const materialParams = {
         donutColor: donutMesh.material.color.getHex()
@@ -200,6 +204,7 @@ function setGui() {
     gui.add(cap,'visible').name('cap')
     gui.add(capAlt,'visible').name('capAlt')
     
+
 }
 
 for (const trigger of triggers) {
