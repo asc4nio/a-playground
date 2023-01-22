@@ -33,9 +33,16 @@ function init() {
     container.className = "three-container"
     document.body.appendChild(container);
 
+    container.addEventListener("click", (event) => {
+        let allTriggers = document.querySelectorAll('.trigger')
+        allTriggers.forEach((element) => {
+            element.classList.remove('is--open')
+        });
+    })
+
     // CAMERA
     camera = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 0.25, 20);
-    camera.position.set(-2, 0.4, 0);
+    camera.position.set(-2.5, 0.4, 0);
     // camera.lookAt(0, 0, 0);
 
 
@@ -49,7 +56,7 @@ function init() {
     .load( 'hdri02.hdr', function ( texture ) {
         texture.mapping = THREE.EquirectangularReflectionMapping;
 
-        scene.background = texture;
+        // scene.background = texture;
         scene.environment = texture;
 
         scene.backgroundIntensity = 0.2
@@ -87,13 +94,13 @@ function init() {
     // scene.add(directionalLight);
 
 
-    // const pointLight1 = new THREE.PointLight( 0xff00ff, 1, 100, 0.5 );
-    // pointLight1.position.set( 0, 0.4, -2 );
-    // scene.add( pointLight1 );
+    const pointLight1 = new THREE.PointLight( 0xff00ff, 1, 100, 0.5 );
+    pointLight1.position.set( 0, 0.4, -2 );
+    scene.add( pointLight1 );
 
-    // const pointLight2 = new THREE.PointLight( 0x0000ff, 1, 100, 0.5 );
-    // pointLight2.position.set( 0, 0.4, 2 );
-    // scene.add( pointLight2 );
+    const pointLight2 = new THREE.PointLight( 0x0000ff, 1, 100, 0.5 );
+    pointLight2.position.set( 0, 0.4, 2 );
+    scene.add( pointLight2 );
 
 
     // helper
@@ -108,7 +115,7 @@ function init() {
     renderer.setSize(window.innerWidth, window.innerHeight);
 
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1;
+    renderer.toneMappingExposure = 0.33;
     renderer.outputEncoding = THREE.sRGBEncoding;
 
     container.appendChild(renderer.domElement);
@@ -176,11 +183,13 @@ function animate() {
 }
 
 function setGui() {
+    // console.log(canObj)
     let donutMesh = canObj.children[1].children[0]
     const materialParams = {
         donutColor: donutMesh.material.color.getHex()
     }
-    gui.addColor(materialParams,'donutColor').onChange((value)=>donutMesh.material.color.set(value))
+    gui.addColor(materialParams,'donutColor').onChange((value)=>donutMesh.material.color.set(value)).name('donut color')
+    gui.add(canObj.rotation,'y',0,Math.PI*2,0.1).name('rotation')
 }
 
 for (const trigger of triggers) {
@@ -202,10 +211,11 @@ for (const trigger of triggers) {
             duration: 1.6,
             ease: 'Power2.easeInOut'
         })
-
     }
     )
 }
+
+
 
 
 window.addEventListener('resize', onWindowResize);
