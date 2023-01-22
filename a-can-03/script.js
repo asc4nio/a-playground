@@ -197,14 +197,25 @@ function setGui() {
     gui.addColor(materialParams,'donutColor').onChange((value)=>donutMesh.material.color.set(value)).name('donut color')
     gui.add(canObj.rotation,'y',0,Math.PI*2,0.1).name('rotation')
 
-    gui.add(cap,'visible').name('cap')
-    gui.add(capAlt,'visible').name('capAlt')
+    gui.add(cap,'visible').name('cap').onChange((value)=>capAlt.visible= !value).listen()
+    gui.add(capAlt,'visible').name('capAlt').onChange((value)=>cap.visible= !value).listen()
+
+
+    let animations= {
+        spin: function(){
+            gsap.to(canObj.rotation,{y:Math.PI*2, duration:3, ease:'Power2.easeInOut'
+            })
+    }
+}
+
+    gui.add(animations,'spin')
+
     
 }
 
 for (const trigger of triggers) {
     trigger.element.addEventListener("click", (event) => {
-        event.stopPropagation();
+        // event.stopPropagation();
         // console.log(trigger.cameraPosition)
 
         let allTriggers = document.querySelectorAll('.trigger')
