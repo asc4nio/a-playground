@@ -1,14 +1,19 @@
 import * as THREE from 'three';
 import gsap from "gsap"
+import * as dat from 'dat.gui';
 
-// console.log(gsap)
+// console.log(dat)
 
 import { OrbitControls } from '../lib/three.js/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from '../lib/three.js/examples/jsm/loaders/GLTFLoader.js';
 import { RGBELoader } from '../lib/three.js/examples/jsm/loaders//RGBELoader.js';
 
 let camera, scene, renderer, controls
+let canObj
 const raycaster = new THREE.Raycaster();
+
+const gui = new dat.GUI();
+
 
 const triggers = [{
     position: new THREE.Vector3(0, 0.4, 0.1),
@@ -41,56 +46,54 @@ function init() {
     // ENVIRONMENT
     const hdri = new RGBELoader()
     .setPath( 'asset/')
-    .load( 'hdri01.hdr', function ( texture ) {
-        console.log(texture)
+    .load( 'hdri02.hdr', function ( texture ) {
         texture.mapping = THREE.EquirectangularReflectionMapping;
 
-
-        // scene.background = texture;
+        scene.background = texture;
         scene.environment = texture;
 
-        console.log(scene)
-
-        // scene.lightMapIntensity = 1
-        
         scene.backgroundIntensity = 0.2
-        scene.backgroundBlurriness = 0.4
-
+        // scene.backgroundBlurriness = 0.4
     } );
 
     // MODEL
     const loader = new GLTFLoader().setPath('asset/');
     loader.load('can02.glb', function (gltf) {
-        console.log(gltf)
-        gltf.scene.scale.set(0.01, 0.01, 0.01);
-        gltf.scene.position.set(0, -0.45, 0);
+        // console.log(gltf)
+        // console.log(gltf.scene.children[0])
 
+        canObj = gltf.scene.children[0]
+
+        canObj.scale.set(0.16, 0.16, 0.16);
+        canObj.position.set(0, -0.45, 0);
+
+        // gltf.scene.scale.set(0.01, 0.01, 0.01);
+        // gltf.scene.position.set(0, -0.45, 0);
         // gltf.scene.traverse( child => {
         //     if ( child.material ) child.material.metalness = 0;
         // } );
+        // scene.add(gltf.scene);
+        
+        scene.add(canObj);
+        console.log(canObj)
 
-        // console.log(scene)
-
-        scene.add(gltf.scene);
+        setGui()
     });
 
-    // const hemiLight = new THREE.HemisphereLight( 0xffffff, 0xffffff, 0.1 );
-    // hemiLight.color.setHSL( 0.6, 1, 0.6 );
-    // hemiLight.groundColor.setHSL( 0.095, 1, 0.75 );
-    // hemiLight.position.set( 0, 0, 0 );
-    // scene.add( hemiLight );
 
-    const directionalLight = new THREE.DirectionalLight(0xFff, 0.1);
-    scene.add(directionalLight);
+            
+
+    // const directionalLight = new THREE.DirectionalLight(0xFff, 0.1);
+    // scene.add(directionalLight);
 
 
-    const pointLight1 = new THREE.PointLight( 0xff00ff, 1, 100, 0.5 );
-    pointLight1.position.set( 0, 0.4, -2 );
-    scene.add( pointLight1 );
+    // const pointLight1 = new THREE.PointLight( 0xff00ff, 1, 100, 0.5 );
+    // pointLight1.position.set( 0, 0.4, -2 );
+    // scene.add( pointLight1 );
 
-    const pointLight2 = new THREE.PointLight( 0x0000ff, 1, 100, 0.5 );
-    pointLight2.position.set( 0, 0.4, 2 );
-    scene.add( pointLight2 );
+    // const pointLight2 = new THREE.PointLight( 0x0000ff, 1, 100, 0.5 );
+    // pointLight2.position.set( 0, 0.4, 2 );
+    // scene.add( pointLight2 );
 
 
     // helper
@@ -172,6 +175,13 @@ function animate() {
 
 }
 
+function setGui() {
+    let donutMesh = canObj.children[1].children[0]
+    const materialParams = {
+        donutColor: donutMesh.material.color.getHex()
+    }
+    gui.addColor(materialParams,'donutColor').onChange((value)=>donutMesh.material.color.set(value))
+}
 
 for (const trigger of triggers) {
     trigger.element.addEventListener("click", (event) => {
