@@ -2,15 +2,18 @@ body {
   margin: 0px;
   background-color: rgb(240, 240, 240);
   background: linear-gradient(45deg, rgba(255,0,255,1) 0%, rgba(0,0,255,1) 100%);
-  font-size: 1vw;
+  /* font-size: 1vw; */
+  font-size: 0.8em;
   line-height: 1;
   font-family: arial, sans-serif;
+
+  overflow: hidden;
 }
 
 p {
   font-size: 1em;
 }
-@media screen and (min-width:2000px) {
+/* @media screen and (min-width:2000px) {
   body {
     font-size: 0.75vw;
   }
@@ -25,7 +28,7 @@ p {
   body {
     font-size: 4vw;
   }
-}
+} */
 
 
 .ui {
@@ -42,7 +45,6 @@ p {
   align-items: center;
 
   pointer-events: none;
-
 }
 
 
@@ -121,3 +123,115 @@ p {
 }
 
 /* .three-container{} */
+
+
+.panels{
+  position: fixed;
+  overflow: auto;
+  pointer-events: initial;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 1em;
+  display: flex;
+  align-items: stretch;
+  justify-content: flex-start;
+}
+
+
+.panel{
+  padding: 0em 0em ;
+  height: auto;
+  display: flex;
+  margin-right: 1em;
+}
+
+.panel-inner{
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 1em;
+  height: auto;
+  background-color: rgba(255, 255, 255, 0.75);
+  border-radius: 1em;
+
+}
+
+.panel-title {
+  margin-right: 1em;
+}
+
+.cap-trigger{
+  border-radius: 0.5em;
+  padding: 1em;
+  width: auto;
+  /* height: 3em; */
+  background-color: rgb(139, 139, 139);
+  margin-right: 1em;
+  font-weight: bold;
+
+  white-space: nowrap;
+
+  /* box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box; */
+}
+
+.cap-trigger.is--active{
+  /* border-style: dashed;
+  border-color: rgb(0, 0, 0);
+  border-width: 0.25em; */
+
+  outline:0.25em dashed black;
+}
+
+.panel-inner.color, .panel-inner.cap{
+  display: flex;
+}
+
+.color-trigger{
+width: 3em;
+height: 3em;
+border-radius: 0.5em;
+margin-right: 1em;
+background-color: var(--hex)
+}
+
+.color-trigger.is--active{
+  /* border-style: dashed;
+  border-color: rgb(0, 0, 0);
+  border-width: 0.25em; */
+
+  outline:0.25em dashed black;
+}
+
+.slider {
+  -webkit-appearance: none;
+  width: 100%;
+  min-width: 8em;
+  height: 1em;
+  border-radius: 0.5em;  
+  background: #ffffff;
+  outline: none;
+  opacity: 0.7;
+  -webkit-transition: .2s;
+  transition: opacity .2s;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 1em;
+  height: 1em;
+  border-radius: 1em; 
+  background: #04AA6D;
+  cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+  width: 1em;
+  height: 1em;
+  border-radius: 50%;
+  background: #04AA6D;
+  cursor: pointer;
+}

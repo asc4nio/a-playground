@@ -2,8 +2,6 @@ import * as THREE from 'three';
 import gsap from "gsap"
 import * as dat from 'dat.gui';
 
-// console.log(dat)
-
 import { OrbitControls } from '../lib/three.js/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from '../lib/three.js/examples/jsm/loaders/GLTFLoader.js';
 import { RGBELoader } from '../lib/three.js/examples/jsm/loaders//RGBELoader.js';
@@ -52,60 +50,50 @@ function init() {
 
     // ENVIRONMENT
     const hdri = new RGBELoader()
-    .setPath( 'asset/')
-    .load( 'hdri02.hdr', function ( texture ) {
-        texture.mapping = THREE.EquirectangularReflectionMapping;
+        .setPath('asset/')
+        .load('hdri02.hdr', function (texture) {
+            texture.mapping = THREE.EquirectangularReflectionMapping;
 
-        // scene.background = texture;
-        scene.environment = texture;
+            // scene.background = texture;
+            scene.environment = texture;
 
-        scene.backgroundIntensity = 0.2
-        // scene.backgroundBlurriness = 0.4
-    } );
+            scene.backgroundIntensity = 0.2
+            // scene.backgroundBlurriness = 0.4
+        });
 
     // MODEL
     const loader = new GLTFLoader().setPath('asset/');
 
     loader.load('can03.glb', function (gltf) {
 
-        // console.log(gltf)
-        // console.log(gltf.scene.children[0])
-
         canObj = gltf.scene.children[0]
 
         canObj.scale.set(0.16, 0.16, 0.16);
         canObj.position.set(0, -0.45, 0);
 
-        // gltf.scene.scale.set(0.01, 0.01, 0.01);
-        // gltf.scene.position.set(0, -0.45, 0);
-        // gltf.scene.traverse( child => {
-        //     if ( child.material ) child.material.metalness = 0;
-        // } );
-        // scene.add(gltf.scene);
-
         canObj.children[0].visible = false
 
-        
+
         scene.add(canObj);
-        console.log(canObj)
 
         setGui()
+
     });
 
 
-            
+
 
     // const directionalLight = new THREE.DirectionalLight(0xFff, 0.1);
     // scene.add(directionalLight);
 
 
-    const pointLight1 = new THREE.PointLight( 0xff00ff, 1, 100, 0.5 );
-    pointLight1.position.set( 0, 0.4, -2 );
-    scene.add( pointLight1 );
+    const pointLight1 = new THREE.PointLight(0xff00ff, 1, 100, 0.5);
+    pointLight1.position.set(0, 0.4, -2);
+    scene.add(pointLight1);
 
-    const pointLight2 = new THREE.PointLight( 0x0000ff, 1, 100, 0.5 );
-    pointLight2.position.set( 0, 0.4, 2 );
-    scene.add( pointLight2 );
+    const pointLight2 = new THREE.PointLight(0x0000ff, 1, 100, 0.5);
+    pointLight2.position.set(0, 0.4, 2);
+    scene.add(pointLight2);
 
 
     // helper
@@ -115,7 +103,7 @@ function init() {
     // RENDERER
 
     renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setClearColor( 0x000000, 0 ); // the default
+    renderer.setClearColor(0x000000, 0); // the default
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(window.innerWidth, window.innerHeight);
 
@@ -188,47 +176,102 @@ function animate() {
 }
 
 function setGui() {
-    // console.log(canObj)
+    // let donutMesh = canObj.children[2].children[0]
+    // const materialParams = {
+    //     donutColor: donutMesh.material.color.getHex()
+    // }
+    // let capAlt = canObj.children[0]
+    // let cap = canObj.children[1]
+    // gui.addColor(materialParams,'donutColor').onChange((value)=>donutMesh.material.color.set(value)).name('donut color')
+    // gui.add(canObj.rotation,'y',0,Math.PI*2,0.1).name('rotation')
+    // gui.add(cap,'visible').name('cap')
+    // gui.add(capAlt,'visible').name('capAlt')
 
-    let donutMesh = canObj.children[2].children[0]
-    const materialParams = {
-        donutColor: donutMesh.material.color.getHex()
-    }
-
-    let capAlt = canObj.children[0]
-    let cap = canObj.children[1]
-
-    gui.addColor(materialParams,'donutColor').onChange((value)=>donutMesh.material.color.set(value)).name('donut color')
-    gui.add(canObj.rotation,'y',0,Math.PI*2,0.1).name('rotation')
-
-    gui.add(cap,'visible').name('cap')
-    gui.add(capAlt,'visible').name('capAlt')
+    for (const trigger of triggers) {
+        trigger.element.addEventListener("click", (event) => {
+            event.stopPropagation();
     
-
-}
-
-for (const trigger of triggers) {
-    trigger.element.addEventListener("click", (event) => {
-        event.stopPropagation();
-        // console.log(trigger.cameraPosition)
-
-        let allTriggers = document.querySelectorAll('.trigger')
-        allTriggers.forEach((element) => {
-            element.classList.remove('is--open')
-        });
-
-        trigger.element.classList.add('is--open')
-
-        gsap.to(camera.position, {
-            x: trigger.cameraPosition.x,
-            y: trigger.cameraPosition.y,
-            z: trigger.cameraPosition.z,
-            duration: 1.6,
-            ease: 'Power2.easeInOut'
+            let allTriggers = document.querySelectorAll('.trigger')
+            allTriggers.forEach((element) => {
+                element.classList.remove('is--open')
+            });
+    
+            trigger.element.classList.add('is--open')
+    
+            gsap.to(camera.position, {
+                x: trigger.cameraPosition.x,
+                y: trigger.cameraPosition.y,
+                z: trigger.cameraPosition.z,
+                duration: 1.6,
+                ease: 'Power2.easeInOut'
+            })
         })
     }
-    )
+
+
+    let slider = document.querySelector('#rotation-slider') // rotation
+    slider.addEventListener("input", function () {
+        this.setAttribute('value', this.value);
+        canObj.rotation.y = this.value
+    })
+
+    let colorTriggers = document.querySelectorAll('.color-trigger')
+    for (let trigger of colorTriggers) {
+        trigger.addEventListener("click", (event) => {
+
+            let allTriggers = document.querySelectorAll('.color-trigger')
+            allTriggers.forEach((element) => {
+                element.classList.remove('is--active')
+            });
+
+            trigger.classList.add('is--active')
+            
+            let nextColor = trigger.attributes.threecolor.value
+            canObj.children[2].children[0].material.color.setHex(nextColor)
+        })
+    }
+
+    let capTriggers = document.querySelectorAll('.cap-trigger')
+    for (let trigger of capTriggers) {
+        trigger.addEventListener("click", (event) => {
+
+            let allTriggers = document.querySelectorAll('.cap-trigger')
+            allTriggers.forEach((element) => {
+                element.classList.remove('is--active')
+            });
+
+            trigger.classList.add('is--active')
+            
+
+            let capAlt = canObj.children[0]
+            let cap = canObj.children[1]
+
+            switch (trigger.attributes.threeobj.value) {
+                case 'noCap':
+                    cap.visible = false
+                    capAlt.visible = false
+                    break;
+                case 'cap':
+                    cap.visible = true
+                    capAlt.visible = false
+                    break;
+                case 'capAlt':
+                    cap.visible = false
+                    capAlt.visible = true
+                    break;
+                default:
+                    break;
+            }
+        })
+    }
+
+    function changeColor() {
+
+    }
 }
+
+
+
 
 
 
