@@ -218,6 +218,14 @@ function setGui() {
     let colorTriggers = document.querySelectorAll('.color-trigger')
     for (let trigger of colorTriggers) {
         trigger.addEventListener("click", (event) => {
+
+            let allTriggers = document.querySelectorAll('.color-trigger')
+            allTriggers.forEach((element) => {
+                element.classList.remove('is--active')
+            });
+
+            trigger.classList.add('is--active')
+            
             let nextColor = trigger.attributes.threecolor.value
             canObj.children[2].children[0].material.color.setHex(nextColor)
         })
@@ -226,6 +234,15 @@ function setGui() {
     let capTriggers = document.querySelectorAll('.cap-trigger')
     for (let trigger of capTriggers) {
         trigger.addEventListener("click", (event) => {
+
+            let allTriggers = document.querySelectorAll('.cap-trigger')
+            allTriggers.forEach((element) => {
+                element.classList.remove('is--active')
+            });
+
+            trigger.classList.add('is--active')
+            
+
             let capAlt = canObj.children[0]
             let cap = canObj.children[1]
 
