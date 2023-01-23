@@ -10,6 +10,8 @@ import Fascio from './modules/fascio.js'
 import Deco from './modules/deco.js'
 // import addSkyGradient from './modules/skyGradient.js'
 
+import * as dat from 'dat.gui';
+
 import { backgroundGrid, polarGrid, getRandomArbitrary, getRandomInt, chooseStar } from './modules/utility.js'
 
 
@@ -17,9 +19,12 @@ import { backgroundGrid, polarGrid, getRandomArbitrary, getRandomInt, chooseStar
 /////////////////////////////////////////////////////////////////////////////////
 //  GLOBAL VARIABLES
 /////////////////////////////////////////////////////////////////////////////////
+const gui = new dat.GUI();
+
+
 window.debugFunctions = {
-    isOrbitControl: false,
-    isPointerCameraControl: true
+    isOrbitControl: true,
+    isPointerCameraControl: false
 }
 
 window.starsSpeedIncrement = 1
@@ -27,6 +32,9 @@ window.starsQuantity = 6
 
 window.camXMoveRange = 1.25
 window.camYMoveRange = 1.25
+
+gui.add(debugFunctions,"isPointerCameraControl")
+gui.add(window,"starsSpeedIncrement",0,4,0.1)
 
 
 //  CONTENT
@@ -78,7 +86,7 @@ function init() {
     scene = new THREE.Scene();
     // scene.fog = new THREE.FogExp2(0x000000, 0.01);
 
-    backgroundGrid(scene)
+    //backgroundGrid(scene)
     // polarGrid(scene)
 
     if (debugFunctions.isOrbitControl) {

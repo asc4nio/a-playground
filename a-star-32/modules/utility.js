@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 
 export function backgroundGrid(scene) {
-    let gridSize = 100
+    let gridSize = 50
     let gridSub = 50
     let compZPos = 0
 
@@ -12,6 +12,7 @@ export function backgroundGrid(scene) {
     gridHelper1.rotation.x = Math.PI / 2
     gridHelper1.position.z = compZPos - gridSize
     scene.add(gridHelper1)
+
     // bottom
     const gridHelper2 = new THREE.GridHelper(gridSize, gridSub, gridColor, gridColor);
     gridHelper2.rotation.y = Math.PI / 2
