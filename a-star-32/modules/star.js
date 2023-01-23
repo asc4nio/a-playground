@@ -16,7 +16,7 @@ class Star {
             xPosRange: 5,
             yPosRange: 5,
             zPosMin: -25,
-            zPosMax: -75,
+            zPosMax: -50,
         }
         this.end = {
             zDeadPos: -3, // last fadeOut z Position
