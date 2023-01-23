@@ -187,6 +187,27 @@ function setGui() {
     // gui.add(cap,'visible').name('cap')
     // gui.add(capAlt,'visible').name('capAlt')
 
+    for (const trigger of triggers) {
+        trigger.element.addEventListener("click", (event) => {
+            event.stopPropagation();
+    
+            let allTriggers = document.querySelectorAll('.trigger')
+            allTriggers.forEach((element) => {
+                element.classList.remove('is--open')
+            });
+    
+            trigger.element.classList.add('is--open')
+    
+            gsap.to(camera.position, {
+                x: trigger.cameraPosition.x,
+                y: trigger.cameraPosition.y,
+                z: trigger.cameraPosition.z,
+                duration: 1.6,
+                ease: 'Power2.easeInOut'
+            })
+        })
+    }
+
 
     let slider = document.querySelector('#rotation-slider') // rotation
     slider.addEventListener("input", function () {
@@ -205,7 +226,6 @@ function setGui() {
     let capTriggers = document.querySelectorAll('.cap-trigger')
     for (let trigger of capTriggers) {
         trigger.addEventListener("click", (event) => {
-
             let capAlt = canObj.children[0]
             let cap = canObj.children[1]
 
@@ -225,7 +245,6 @@ function setGui() {
                 default:
                     break;
             }
-
         })
     }
 
@@ -234,32 +253,8 @@ function setGui() {
     }
 }
 
-function changeCap() {
-
-}
 
 
-for (const trigger of triggers) {
-    trigger.element.addEventListener("click", (event) => {
-        event.stopPropagation();
-
-        let allTriggers = document.querySelectorAll('.trigger')
-        allTriggers.forEach((element) => {
-            element.classList.remove('is--open')
-        });
-
-        trigger.element.classList.add('is--open')
-
-        gsap.to(camera.position, {
-            x: trigger.cameraPosition.x,
-            y: trigger.cameraPosition.y,
-            z: trigger.cameraPosition.z,
-            duration: 1.6,
-            ease: 'Power2.easeInOut'
-        })
-    }
-    )
-}
 
 
 

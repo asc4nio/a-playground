@@ -5,6 +5,8 @@ body {
   font-size: 1vw;
   line-height: 1;
   font-family: arial, sans-serif;
+
+  overflow: hidden;
 }
 
 p {
@@ -144,13 +146,17 @@ p {
 
 .panel-inner{
   display: flex;
+  align-items: center;
+  justify-content: flex-start;
   padding: 1em;
   height: auto;
   background-color: rgba(255, 255, 255, 0.75);
   border-radius: 1em;
 
+}
 
-
+.panel-title {
+  margin-right: 1em;
 }
 
 .cap-trigger{
