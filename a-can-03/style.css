@@ -42,7 +42,6 @@ p {
   align-items: center;
 
   pointer-events: none;
-
 }
 
 
@@ -121,3 +120,57 @@ p {
 }
 
 /* .three-container{} */
+
+
+.panels{
+  position: fixed;
+  overflow: auto;
+  pointer-events: initial;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 1em;
+  display: flex;
+  align-items: stretch;
+  justify-content: flex-start;
+}
+
+
+.panel{
+  padding: 0em 0em ;
+  height: auto;
+  display: flex;
+}
+
+.panel-inner{
+  display: flex;
+  padding: 1em;
+  height: auto;
+  background-color: rgba(255, 255, 255, 0.75);
+  border-radius: 1em;
+
+
+
+}
+
+.cap-trigger{
+  border-radius: 0.5em;
+  padding: 1em;
+  width: auto;
+  /* height: 3em; */
+  background-color: blue;
+  color: aliceblue;
+  margin-right: 1em;
+}
+
+.panel-inner.color, .panel-inner.cap{
+  display: flex;
+}
+
+.color-trigger{
+width: 3em;
+height: 3em;
+border-radius: 0.5em;
+margin-right: 1em;
+background-color: var(--hex)
+}
