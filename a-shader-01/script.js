@@ -34,7 +34,7 @@ function init() {
 
     // CAMERA
     camera = new THREE.PerspectiveCamera(30, container.offsetWidth / container.offsetHeight, 0.25, 20);
-    camera.position.set(-2.5, 0.4, 0);
+    camera.position.set(-2, 1, 0);
 
     // SCENE
     scene = new THREE.Scene();
@@ -61,7 +61,7 @@ function init() {
 
     const shaderMaterial = new THREE.ShaderMaterial({
         uniforms: {
-            // time: { value: 1.0 }
+             time: { value: 1.0 }
         },
         vertexShader: _VS,
         fragmentShader: _FS,
@@ -70,7 +70,7 @@ function init() {
 
 
     const object = new THREE.Mesh(
-        new THREE.SphereGeometry(1, 8,8),
+        new THREE.SphereGeometry(1,16,16),
         shaderMaterial
     )
     object.scale.set(0.25,0.25,0.25)
@@ -81,9 +81,9 @@ function init() {
 
 
     const ground = new THREE.Mesh(
-        new THREE.PlaneGeometry(10,10,10,10),
-        new THREE.MeshToonMaterial({color:'#444'})
-        // new THREE.MeshStandardMaterial({color:'#444'})
+        new THREE.PlaneGeometry(10,10,10,1),
+        //new THREE.MeshToonMaterial({color:'#444'})
+        new THREE.MeshStandardMaterial({color:'#444'})
     )
     ground.rotation.set(-Math.PI/2, 0, 0)
     ground.castShadow=false
@@ -98,7 +98,7 @@ function init() {
     const directionalLight = new THREE.DirectionalLight('#ffffff',2);
     directionalLight.castShadow = true;
     directionalLight.shadow.camera.far = 15
-    directionalLight.shadow.mapSize.set(1024,1024)
+    directionalLight.shadow.mapSize.set(4096,4096)
     directionalLight.position.set(-4, 4, 4);
     directionalLight.target.position.set(0, 0, 0);
     scene.add(directionalLight);
