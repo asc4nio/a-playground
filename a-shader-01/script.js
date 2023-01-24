@@ -74,8 +74,6 @@ function init() {
     container.appendChild(renderer.domElement);
 
     controls = new OrbitControls(camera, renderer.domElement);
-    controls.minDistance = 0.75;
-    controls.maxDistance = 5;
     controls.update();
 
 
@@ -92,21 +90,22 @@ function init() {
     })
 
 
-    const object = new THREE.Mesh(
-        new THREE.SphereGeometry(1,16,16),
-        shaderMaterial
-    )
-    object.scale.set(0.25,0.25,0.25)
-    object.position.set(0,0.25,0)
-    object.castShadow= true
-    object.receiveShadow = true
-    scene.add(object);
+    // const object = new THREE.Mesh(
+    //     new THREE.SphereGeometry(1,16,16),
+    //     shaderMaterial
+    // )
+    // object.scale.set(0.25,0.25,0.25)
+    // object.position.set(0,0.25,0)
+    // object.castShadow= true
+    // object.receiveShadow = true
+    // scene.add(object);
 
 
     const ground = new THREE.Mesh(
-        new THREE.PlaneGeometry(10,10,10,1),
+        new THREE.PlaneGeometry(4,4,4,1),
         //new THREE.MeshToonMaterial({color:'#444'})
-        new THREE.MeshStandardMaterial({color:'#444'})
+        // new THREE.MeshStandardMaterial({color:'#444'})
+        shaderMaterial
     )
     ground.rotation.set(-Math.PI/2, 0, 0)
     ground.castShadow=false
