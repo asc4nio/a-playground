@@ -19,13 +19,33 @@ void main() {
 `;
 
 const _FS = `
+uniform vec3 sphereColour;
+varying vec3 v_Normal;
+
+void main() {
+    // gl_FragColor = vec4(v_Normal, 1.0);
+    gl_FragColor = vec4(sphereColour, 1.0);
+}
+`
+
+/**
+const _VS = `
+varying vec3 v_Normal;
+
+void main() {
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    v_Normal = normal;
+}
+`;
+
+const _FS = `
 varying vec3 v_Normal;
 
 void main() {
     gl_FragColor = vec4(v_Normal, 1.0);
 }
 `
-
+ */
 
 
 function init() {
@@ -39,7 +59,7 @@ function init() {
     // SCENE
     scene = new THREE.Scene();
 
-    // scene.add(new THREE.GridHelper(4, 12, 0x888888, 0x444444)); //helper
+    scene.add(new THREE.GridHelper(10, 10, 0x888888, 0x000000)); //helper
     scene.add(new THREE.AxesHelper(2)); //helper
 
 
@@ -61,7 +81,10 @@ function init() {
 
     const shaderMaterial = new THREE.ShaderMaterial({
         uniforms: {
-             time: { value: 1.0 }
+             time: { value: 1.0 },
+             sphereColour: {
+                value: new THREE.Vector3(0,0,1)
+             }
         },
         vertexShader: _VS,
         fragmentShader: _FS,
