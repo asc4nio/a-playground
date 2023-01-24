@@ -40,6 +40,8 @@ function init() {
     scene = new THREE.Scene();
 
     // scene.add(new THREE.GridHelper(4, 12, 0x888888, 0x444444)); //helper
+    scene.add(new THREE.AxesHelper(2)); //helper
+
 
 
     // RENDERER
@@ -49,29 +51,12 @@ function init() {
     renderer.shadowMap.enabled = true;
     // renderer.shadowMap.type = THREE.PCFSoftShadowMap
     // renderer.shadowMap.type = THREE.BasicShadowMap
-
-
     container.appendChild(renderer.domElement);
 
     controls = new OrbitControls(camera, renderer.domElement);
     controls.minDistance = 0.75;
     controls.maxDistance = 5;
-
-    // controls.enablePan = false
-    // controls.enableZoom = false
-
-    // controls.minPolarAngle = Math.PI * 0.25 // fix vertical rotation
-    // controls.maxPolarAngle = Math.PI * 0.75 // fix vertical rotation
-
-    controls.enableDamping = true
-    controls.dampingFactor = 0.025
-
-    // controls.target.set( 0, 0, - 0.2 );
-    // controls.autoRotate = true
-    // controls.autoRotateSpeed = 1
-
     controls.update();
-
 
 
     const shaderMaterial = new THREE.ShaderMaterial({
@@ -83,10 +68,10 @@ function init() {
         // wireframe: false
     })
 
+
     const object = new THREE.Mesh(
         new THREE.SphereGeometry(1, 8,8),
         shaderMaterial
-        // new THREE.MeshToonMaterial({color:'#444'})
     )
     object.scale.set(0.25,0.25,0.25)
     object.position.set(0,0.25,0)
@@ -94,46 +79,37 @@ function init() {
     object.receiveShadow = true
     scene.add(object);
 
+
     const ground = new THREE.Mesh(
         new THREE.PlaneGeometry(10,10,10,10),
-        // new THREE.MeshToonMaterial({color:'#444'})
-        new THREE.MeshStandardMaterial({color:'#444'})
+        new THREE.MeshToonMaterial({color:'#444'})
+        // new THREE.MeshStandardMaterial({color:'#444'})
     )
     ground.rotation.set(-Math.PI/2, 0, 0)
-    ground.castShadow=true
+    ground.castShadow=false
     ground.receiveShadow=true
     scene.add(ground);
-
-
-
-
-
-
-
 
 
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.5)
     scene.add(ambientLight)
 
+
     const directionalLight = new THREE.DirectionalLight('#ffffff',2);
     directionalLight.castShadow = true;
     directionalLight.shadow.camera.far = 15
     directionalLight.shadow.mapSize.set(1024,1024)
-
     directionalLight.position.set(-4, 4, 4);
     directionalLight.target.position.set(0, 0, 0);
     scene.add(directionalLight);
 
-
-    const helper = new THREE.DirectionalLightHelper(directionalLight);
-    scene.add(helper);
+    const directionalLightHelper = new THREE.DirectionalLightHelper(directionalLight);
+    scene.add(directionalLightHelper);
 
 
 }
 
 function animate() {
-    controls.update();
-
     renderer.render(scene, camera);
 
     requestAnimationFrame(animate);
