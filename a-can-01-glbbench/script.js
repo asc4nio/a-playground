@@ -55,7 +55,7 @@ function init() {
 
     // MODEL
     const loader = new GLTFLoader().setPath('asset/');
-    loader.load('can-03.glb', function (gltf) {
+    loader.load('can-04.glb', function (gltf) {
         console.log(gltf)
 
         gltf.scene.scale.set(0.4, 0.4, 0.4);
