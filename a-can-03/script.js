@@ -10,7 +10,7 @@ let camera, scene, renderer, controls
 let canObj
 const raycaster = new THREE.Raycaster();
 
-const gui = new dat.GUI();
+// const gui = new dat.GUI();
 
 
 const triggers = [{

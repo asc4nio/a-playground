@@ -7,6 +7,10 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 	<link type="text/css" rel="stylesheet" href="style.css">
+
+	<script src="../lib/pace.js/pace.min.js"></script>
+	<link rel="stylesheet" href="../lib/pace.js/themes/big-counter.css">
+
 </head>
 
 <body>
@@ -74,6 +78,17 @@
 			</div>
 		</div>
 	</div>
+
+	<script>
+		window.paceOptions = {
+		// Disable the 'elements' source
+		// elements: false,
+
+		// Only show the progress on regular and ajax-y page navigation,
+		// not every request
+		restartOnRequestAfter: true
+		}
+	</script>
 
 
 	<!-- Import maps polyfill -->
