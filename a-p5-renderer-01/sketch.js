@@ -1,88 +1,65 @@
-const density = "987654321"
-let inputImg
-
-let renderer = {
+var renderer = {
+  inputImg: null,
+  inputSrc: 'asset/inputTest.jpg',
+  density: "0987654321",
+  itemSize: 'responsive',
   cornerRadius: 0,
-  cornerRadiusMax : 16
+  cornerRadiusMax: 12,
+  cornerAnim: function () {
+    const cornerAnimTl = gsap.timeline({ repeat: -1 })
+    cornerAnimTl.fromTo(renderer, { cornerRadius: 0 }, { cornerRadius: renderer.cornerRadiusMax, duration: 1, ease: 'none' }, '0')
+    cornerAnimTl.fromTo(renderer, { cornerRadius: renderer.cornerRadiusMax }, { cornerRadius: 0, duration: 1, ease: 'none' }, '>')
+  }
 }
 
-let cornerAnim = gsap.timeline({repeat:-1, onUpdate: () => {console.log(renderer.cornerRadius)}})
-cornerAnim.to(renderer,{cornerRadius:0, duration:1, ease:'none'},'0')
-cornerAnim.to(renderer,{cornerRadius:renderer.cornerRadiusMax, duration:1, ease:'none'},'>')
 
-function preload(){
-  inputImg = loadImage('asset/inputTest.jpg')
+function preload() {
+  renderer.inputImg = loadImage(renderer.inputSrc)
 }
+
 
 function setup() {
-  createCanvas(innerWidth,innerHeight);
+  createCanvas(innerWidth, innerHeight);
+
+  renderer.cornerAnim()
 }
+
 
 function draw() {
-background(0)
-// image(inputImg,0,0,width,height)
-
-let w = width / inputImg.width;
-let h = height / inputImg.height;
-
-inputImg.loadPixels();
-
-for (let i = 0; i < inputImg.width; i++) {
-  for (let j = 0; j < inputImg.height; j++) {
-    const pixelIndex = (i + j * inputImg.width) * 4;
-    const r = inputImg.pixels[pixelIndex + 0];
-    const g = inputImg.pixels[pixelIndex + 1];
-    const b = inputImg.pixels[pixelIndex + 2];
-    const avg = (r + g + b) / 3;
-    
-    noStroke();
-    fill(avg);
-    // circle(i * w, j * h, w);
-    rect(i * w, j * h, w,h, renderer.cornerRadius,renderer.cornerRadius,renderer.cornerRadius,renderer.cornerRadius)
-    
-    // const len = density.length;
-    // const charIndex = floor(map(avg,0,255,len,0));
+  background(0)
   
-    // textSize(w);
-    // textAlign(CENTER, CENTER);
-    // text(density.charAt(charIndex), i * w + w * 0.5, j * h + h * 0.5);
-    
+  renderer.inputImg.loadPixels();
+
+  if(renderer.itemSize === 'responsive'){
+    var w = width / renderer.inputImg.width;
+    var h = height / renderer.inputImg.height;
+  } else {
+    var w = renderer.itemSize
+    var h = renderer.itemSize
   }
-} 
+
+  for (let i = 0; i < renderer.inputImg.width; i++) {
+    for (let j = 0; j < renderer.inputImg.height; j++) {
+      const pixelIndex = (i + j * renderer.inputImg.width) * 4;
+      const r = renderer.inputImg.pixels[pixelIndex + 0];
+      const g = renderer.inputImg.pixels[pixelIndex + 1];
+      const b = renderer.inputImg.pixels[pixelIndex + 2];
+      const avg = (r + g + b) / 3;
+
+      noStroke();
+      fill(avg);
+      rect(i * w, j * h, w, h, renderer.cornerRadius, renderer.cornerRadius, renderer.cornerRadius, renderer.cornerRadius)
+
+      // const len = renderer.density.length;
+      // const charIndex = floor(map(avg,0,255,len,0));
+
+      // textSize(w);
+      // textAlign(CENTER, CENTER);
+      // text(renderer.density.charAt(charIndex), i * w + w * 0.5, j * h + h * 0.5);
+
+    }
+  }
 }
-
-// let w = width / inputImg.width;
-// let h = height / inputImg.height
-
-// inputImg.loadPixels()
-
-// for(let y=0; y < inputImg.height; y++ ){
-
-//   for(let x=0; x < inputImg.width; x++ ){
-
-//     const pixelIndex = (x + y * inputImg.width *4)
-
-//     const r =  inputImg.pixels[pixelIndex+0]
-//     const g =  inputImg.pixels[pixelIndex+1]
-//     const b =  inputImg.pixels[pixelIndex+2]
-//     // const a =  inputImg.pixels[pixelIndex+3]
-
-//     // const avg = (r+g+b)/3
-
-//     noStroke()
-//     fill(r,g,b)
-//     square(x*w, y*h, w)
-
-//     // fill(avg)
-//     // text('A',x*w, i*h)
-  
-//   }
-
-// }
-
-// }
-
-
 
 
 
