@@ -59,6 +59,12 @@ h1 {margin: 0;}
   box-shadow:none;
 }
 
+/* .page{
+  max-width: 540px;
+  margin-left: auto;
+  margin-right: 0;
+} */
+
 
 .home-head {
   background-color: #4EACAF;
