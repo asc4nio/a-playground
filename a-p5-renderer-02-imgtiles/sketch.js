@@ -2,7 +2,7 @@ var renderer = {
   inputImg: null,
   inputSrc: 'https://pbs.twimg.com/media/DZy6bkPVwAAhyMJ.jpg',
   density: "0987654321",
-  itemSize: 'responsive',
+  itemSize: 20,
 }
 
 let outputs = []
@@ -10,9 +10,22 @@ let outputs = []
 
 function preload() {
   renderer.inputImg = loadImage(renderer.inputSrc)
+  // outputs[0] = loadImage('asset/tile-01.jpg')
+  // outputs[1] = loadImage('asset/tile-02.jpg')
+  // outputs[2] = loadImage('asset/tile-03.jpg')
+
+  // outputs[3] = loadImage('asset/dot_01.jpg')
+  // outputs[4] = loadImage('asset/dot_02.jpg')
+  // outputs[5] = loadImage('asset/dot_03.jpg')
+
+  
   outputs[0] = loadImage('asset/dot_01.jpg')
-  outputs[1] = loadImage('asset/dot_02.jpg')
-  outputs[2] = loadImage('asset/dot_03.jpg')
+  outputs[1] = loadImage('asset/tile-01.jpg')
+  outputs[2] = loadImage('asset/dot_02.jpg')
+  outputs[3] = loadImage('asset/tile-02.jpg')
+  outputs[4] = loadImage('asset/dot_03.jpg')
+  outputs[5] = loadImage('asset/tile-03.jpg')
+
 }
 
 
