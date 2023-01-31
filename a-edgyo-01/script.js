@@ -78,6 +78,7 @@ function init() {
         "asset/hdri01.hdr",
         function (texture) {
             console.log("HDRI LOADED");
+            document.getElementById("info-hdri").innerHTML = "HDRI Loaded";
             texture.mapping = THREE.EquirectangularReflectionMapping;
 
             scene.environment = texture;
@@ -89,6 +90,7 @@ function init() {
         function (xhr) {
             // called while loading is progressing
             console.log("... loading HDRI");
+            document.getElementById("info-hdri").innerHTML = "... loading HDRI";
         },
         function (error) {
             // called when loading has errors
@@ -98,9 +100,11 @@ function init() {
 
 
     const loader = new GLTFLoader().load(
-        "asset/model-textured.glb",
+        "asset/model-textured-low.glb",
         function (gltf) {
             console.log("MODEL LOADED");
+            document.getElementById("info-model").innerHTML = "MODEL Loaded";
+
             // gltf.scene.scale.set(0.2, 0.2, 0.2);
             // gltf.scene.position.set(0, 0, 0);
 
@@ -125,6 +129,7 @@ function init() {
         function (xhr) {
             // called while loading is progressing
             console.log("... loading MODEL");
+            document.getElementById("info-model").innerHTML = "... loading MODEL";
         },
         function (error) {
             // called when loading has errors
@@ -162,13 +167,13 @@ function init() {
     controls.dampingFactor = 0.025
     controls.enablePan = true
     controls.enableZoom = true
-    // controls.minDistance = 0.75;
-    // controls.maxDistance = 5;
+    controls.minDistance = 1;
+    controls.maxDistance = 7;
     // controls.minPolarAngle = Math.PI * 0.25 // fix vertical rotation
     // controls.maxPolarAngle = Math.PI * 0.75
     controls.target.set(0, 1, 0);
-    // controls.autoRotate = true
-    // controls.autoRotateSpeed = 1
+    controls.autoRotate = true
+    controls.autoRotateSpeed = -1
 
 
 }
