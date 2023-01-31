@@ -37,10 +37,8 @@ function init() {
 
     scene = new THREE.Scene();
 
-    scene.add(new THREE.GridHelper(4, 12, 0x888888, 0x444444)); // helper
-
     // const baseCylinder = new THREE.Mesh(
-    //     new THREE.CylinderGeometry(0.66, 0.66, 0.1, 32 * 3),
+    //     new THREE.CylinderGeometry(0.66, 0.66, 0.01, 32 * 3),
     //     new THREE.MeshPhysicalMaterial({
     //         color: new THREE.Color(0xffffff),
 
@@ -70,12 +68,15 @@ function init() {
     //         transmissionMap: null,
     //     })
     // )
-    // baseCylinder.position.y = -0.05
+    // baseCylinder.castShadow= true
+    // baseCylinder.receiveShadow = true
+    // baseCylinder.position.y = -0.005
     // scene.add(baseCylinder);
 
+    const hdriIntensity = 0.1
 
     const hdri = new RGBELoader().load(
-        "asset/hdri01.hdr",
+        "asset/hdri02.hdr",
         function (texture) {
             console.log("HDRI LOADED");
             document.getElementById("info-hdri").innerHTML = "HDRI Loaded";
@@ -84,8 +85,8 @@ function init() {
             scene.environment = texture;
             scene.background = texture;
 
-            scene.backgroundIntensity = 1 // only visual 'codio
-            scene.backgroundBlurriness = 0.2
+            scene.backgroundIntensity = hdriIntensity // only visual 'codio
+            scene.backgroundBlurriness = 0.5
         },
         function (xhr) {
             // called while loading is progressing
@@ -95,6 +96,7 @@ function init() {
         function (error) {
             // called when loading has errors
             console.log("ERROR loading hdri");
+            document.getElementById("info-hdri").innerHTML = "ERROR loading hdri";
         }
     );
 
@@ -109,10 +111,16 @@ function init() {
             // gltf.scene.position.set(0, 0, 0);
 
             loadedModel = gltf
-            console.log('loadedmodel:', loadedModel)
+            // console.log('loadedmodel:', loadedModel)
+
+            loadedModel.scene.traverse( child => {
+                child.castShadow= true
+                child.receiveShadow = true
+                if ( child.material ){ child.material.envMapIntensity = hdriIntensity}
+            } );
 
             scene.add(loadedModel.scene);
-            console.log('scene:', scene)
+            // console.log('scene:', scene)
 
             // mixer = new THREE.AnimationMixer(loadedModel.scene)
             // clips = loadedModel.animations
@@ -134,59 +142,91 @@ function init() {
         function (error) {
             // called when loading has errors
             console.log("ERROR loading model");
+            document.getElementById("info-model").innerHTML = "ERROR loading model";
         }
     );
 
-    const directionalLight = new THREE.DirectionalLight(0xFF0000, 0.1);
-    directionalLight.position.set(1, 5, 0)
-    const directionalLighthelper = new THREE.DirectionalLightHelper(directionalLight, 5);
+    const shadowResK = 1024 * 8
+
+    const ambientLight = new THREE.AmbientLight( 0x404040, 0.2 ); // soft white light
+    scene.add( ambientLight );
+
+    const directionalLight = new THREE.DirectionalLight(0x00b8e6, 0.7);
+    directionalLight.position.set(-4, 4, -2.5)
+    directionalLight.castShadow = true;
+    directionalLight.shadow.mapSize.set(shadowResK,shadowResK)
+    directionalLight.shadow.bias = -0.0001
     scene.add(directionalLight);
-    scene.add(directionalLighthelper)
 
-    // const pointLight1 = new THREE.PointLight( 0xff00ff, 1, 100, 0.5 );
-    // pointLight1.position.set( 0, 0.4, -2 );
-    // scene.add( pointLight1 );
 
-    // const pointLight2 = new THREE.PointLight( 0x0000ff, 1, 100, 0.5 );
-    // pointLight2.position.set( 0, 0.4, 2 );
-    // scene.add( pointLight2 );
+    const directionalLight2 = new THREE.DirectionalLight(0xFFFFFF, 0.8);
+    directionalLight2.position.set(4,2, 3)
+    directionalLight2.castShadow = true;
+    directionalLight2.shadow.mapSize.set(shadowResK,shadowResK)
+    directionalLight2.shadow.bias = -0.0001
+    scene.add(directionalLight2);
+
+
 
     renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
     renderer.setClearColor(0x111111, 0); // the default
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(window.innerWidth, window.innerHeight);
 
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap
+    // renderer.shadowMap.type = THREE.VSMShadowMap
+
+    renderer.toneMapping = THREE.ACESFilmicToneMapping
     renderer.toneMappingExposure = 1;
     renderer.outputEncoding = THREE.sRGBEncoding;
 
     container.appendChild(renderer.domElement);
 
+
+    addControls()
+
+    scene.add(new THREE.GridHelper(4, 12, 0x888888, 0x444444));
+
+
+    const visualHelpers = false
+    if(visualHelpers){
+        const directionalLighthelper = new THREE.DirectionalLightHelper(directionalLight, 5);
+        scene.add(directionalLighthelper)
+        const directionalLighthelper2 = new THREE.DirectionalLightHelper(directionalLight2, 5);
+        scene.add(directionalLighthelper2)
+    }
+    
+
+}
+
+function addControls(){
     controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true
     controls.dampingFactor = 0.025
     controls.enablePan = true
     controls.enableZoom = true
-    controls.minDistance = 1;
-    controls.maxDistance = 7;
+
+    // controls.minDistance = 1;
+    // controls.maxDistance = 7;
+
     // controls.minPolarAngle = Math.PI * 0.25 // fix vertical rotation
     // controls.maxPolarAngle = Math.PI * 0.75
     controls.target.set(0, 1, 0);
+
     // controls.autoRotate = true
-    controls.autoRotateSpeed = -1
+    // controls.autoRotateSpeed = -1
 
-    var minPan = new THREE.Vector3(-0.5, 0, -0.5);
-    var maxPan = new THREE.Vector3(0.5, 2, 0.5);
-    var _v = new THREE.Vector3();
-
-    controls.addEventListener("change", function () {
-        console.log('changing')
-        _v.copy(controls.target);
-        controls.target.clamp(minPan, maxPan);
-        _v.sub(controls.target);
-        camera.position.sub(_v);
-    })
-
+    // var minPan = new THREE.Vector3(-0.5, 0, -0.5);
+    // var maxPan = new THREE.Vector3(0.5, 2, 0.5);
+    // var _v = new THREE.Vector3();
+    // controls.addEventListener("change", function () {
+    //     console.log('changing')
+    //     _v.copy(controls.target);
+    //     controls.target.clamp(minPan, maxPan);
+    //     _v.sub(controls.target);
+    //     camera.position.sub(_v);
+    // })
 }
 
 
@@ -202,6 +242,7 @@ function onWindowResize() {
 
 function animate() {
     controls.update();
+
 
     // if (mixer) mixer.update(clock.getDelta());
 
