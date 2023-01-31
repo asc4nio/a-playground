@@ -172,11 +172,24 @@ function init() {
     // controls.minPolarAngle = Math.PI * 0.25 // fix vertical rotation
     // controls.maxPolarAngle = Math.PI * 0.75
     controls.target.set(0, 1, 0);
-    controls.autoRotate = true
+    // controls.autoRotate = true
     controls.autoRotateSpeed = -1
 
+    var minPan = new THREE.Vector3(-0.5, 0, -0.5);
+    var maxPan = new THREE.Vector3(0.5, 2, 0.5);
+    var _v = new THREE.Vector3();
+
+    controls.addEventListener("change", function () {
+        console.log('changing')
+        _v.copy(controls.target);
+        controls.target.clamp(minPan, maxPan);
+        _v.sub(controls.target);
+        camera.position.sub(_v);
+    })
 
 }
+
+
 
 function onWindowResize() {
 
