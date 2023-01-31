@@ -32,46 +32,46 @@ function init() {
     clock = new THREE.Clock();
 
     camera = new THREE.PerspectiveCamera(20, window.innerWidth / window.innerHeight, 0.1, 50);
-    camera.position.set(0, 2, 10);
+    camera.position.set(0, 1, 7);
     // camera.lookAt(0, 5, 0);
 
     scene = new THREE.Scene();
 
-    // scene.add(new THREE.GridHelper(4, 12, 0x888888, 0x444444)); // helper
+    scene.add(new THREE.GridHelper(4, 12, 0x888888, 0x444444)); // helper
 
-    const baseCylinder = new THREE.Mesh(
-        new THREE.CylinderGeometry(2, 2, 0.1, 32 * 3),
-        new THREE.MeshPhysicalMaterial({
-            color: new THREE.Color(0xffffff),
+    // const baseCylinder = new THREE.Mesh(
+    //     new THREE.CylinderGeometry(0.66, 0.66, 0.1, 32 * 3),
+    //     new THREE.MeshPhysicalMaterial({
+    //         color: new THREE.Color(0xffffff),
 
-            attenuationColor: new THREE.Color(0xffffff),
-            attenuationDistance: Infinity,
-            clearcoat: 0.0,
-            clearcoatMap: null, //texture
-            clearcoatNormalMap: null, //texture
-            clearcoatNormalScale: new THREE.Vector2(1, 1),
-            clearcoatRoughness: 0.0,
-            clearcoatRoughnessMap: null, //texture
-            defines: {}, //used by the WebGLRenderer for selecting shaders This models the reflectivity of non-metallic materials. It has no effect when metalness is 1.0
-            ior: 1.5,
-            reflectivity: 1, // from 0.0 to 1.0
-            sheen: 0.0,
-            sheenRoughness: 1.0,
-            sheenRoughnessMap: null, //texture
-            sheenColor: new THREE.Color(0xffffff),
-            sheenColorMap: null,
-            specularIntensity: 0.0,
-            specularIntensityMap: null,
-            specularColor: new THREE.Color(0xffffff),
-            specularColorMap: null,
-            thickness: 0,
-            thicknessMap: null,
-            transmission: 0.0,
-            transmissionMap: null,
-        })
-    )
-    baseCylinder.position.y = -0.05
-    scene.add(baseCylinder);
+    //         attenuationColor: new THREE.Color(0xffffff),
+    //         attenuationDistance: Infinity,
+    //         clearcoat: 0.0,
+    //         clearcoatMap: null, //texture
+    //         clearcoatNormalMap: null, //texture
+    //         clearcoatNormalScale: new THREE.Vector2(1, 1),
+    //         clearcoatRoughness: 0.0,
+    //         clearcoatRoughnessMap: null, //texture
+    //         defines: {}, //used by the WebGLRenderer for selecting shaders This models the reflectivity of non-metallic materials. It has no effect when metalness is 1.0
+    //         ior: 1.5,
+    //         reflectivity: 1, // from 0.0 to 1.0
+    //         sheen: 0.0,
+    //         sheenRoughness: 1.0,
+    //         sheenRoughnessMap: null, //texture
+    //         sheenColor: new THREE.Color(0xffffff),
+    //         sheenColorMap: null,
+    //         specularIntensity: 0.0,
+    //         specularIntensityMap: null,
+    //         specularColor: new THREE.Color(0xffffff),
+    //         specularColorMap: null,
+    //         thickness: 0,
+    //         thicknessMap: null,
+    //         transmission: 0.0,
+    //         transmissionMap: null,
+    //     })
+    // )
+    // baseCylinder.position.y = -0.05
+    // scene.add(baseCylinder);
 
 
     const hdri = new RGBELoader().load(
@@ -83,8 +83,8 @@ function init() {
             scene.environment = texture;
             scene.background = texture;
 
-            scene.backgroundIntensity = 0.1 // only visual 'codio
-            // scene.backgroundBlurriness = 0.4
+            scene.backgroundIntensity = 1 // only visual 'codio
+            scene.backgroundBlurriness = 0.2
         },
         function (xhr) {
             // called while loading is progressing
@@ -98,7 +98,7 @@ function init() {
 
 
     const loader = new GLTFLoader().load(
-        "asset/fighter_posed_001.glb",
+        "asset/model-textured.glb",
         function (gltf) {
             console.log("MODEL LOADED");
             // gltf.scene.scale.set(0.2, 0.2, 0.2);
@@ -166,7 +166,7 @@ function init() {
     // controls.maxDistance = 5;
     // controls.minPolarAngle = Math.PI * 0.25 // fix vertical rotation
     // controls.maxPolarAngle = Math.PI * 0.75
-    controls.target.set(0, 1.5, 0);
+    controls.target.set(0, 1, 0);
     // controls.autoRotate = true
     // controls.autoRotateSpeed = 1
 
