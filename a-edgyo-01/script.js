@@ -100,7 +100,7 @@ function init() {
 
 
     const loader = new GLTFLoader().load(
-        "asset/model-textured-low.glb",
+        "asset/model-textured-high.glb",
         function (gltf) {
             console.log("MODEL LOADED");
             document.getElementById("info-model").innerHTML = "MODEL Loaded";
