@@ -6,6 +6,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>a-gpx-01</title>
   <link rel="icon" type="image/x-icon" href="../asset/favicon-white.png">
+
+  <script src="https://cdn.maptiler.com/maplibre-gl-js/v2.4.0/maplibre-gl.js"></script>
+  <link href="https://cdn.maptiler.com/maplibre-gl-js/v2.4.0/maplibre-gl.css" rel="stylesheet" />
+
+
   <style>
     body {
       padding: 0;
@@ -13,18 +18,48 @@
       background-color: #1b1b1b;
     }
 
-    canvas{
+    canvas {
       position: absolute;
     }
+
+    .container{
+      position: relative;
+    }
+
+    #map {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 100%;
+      z-index: 0;
+    }
+
+    .p5 {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 100%;
+      z-index: 100;
+    }
+
   </style>
-  <script src="../lib/GPXParser.js/src/GPXParser.js"></script>
-  <script src="../lib/p5.js/p5.min.js"></script>
-  <script src="sketch.js"></script>
 </head>
 
 <body>
-  <main>
+
+  <div id="map"></div>
+
+  <main class="p5">
   </main>
+
+
+
+  <script src="../lib/GPXParser.js/src/GPXParser.js"></script>
+  <script src="../lib/p5.js/p5.min.js"></script>
+  <script src="sketch.js"></script>
+
+
+
 </body>
 
 </html>
