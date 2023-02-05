@@ -51,11 +51,12 @@ function setup() {
   createCanvas(800, 800);
   clear()
 
-  image(mapImage,0,0,width,height)
+  image(mapImage,0,0,width,height,10,15,780,800)
 
 }
 
 function draw() {
+  stroke(255,0,0)
   beginShape()
   noFill()
   for(let i=0; i<gpx.tracks[0].points.length; i++){
@@ -69,11 +70,11 @@ function draw() {
     let mapLon = map(lon,11.3569,11.4382,0,height)
 
     vertex(mapLon,mapLat)
-    // push()
-    //   noStroke()
-    //   fill(255)
-    //   circle(mapLat,mapLon,4)
-    // pop()
+    push()
+      noStroke()
+      fill(0,0,255)
+      circle(mapLon,mapLat,4)
+    pop()
   }
   endShape()
 
