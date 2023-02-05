@@ -1,23 +1,27 @@
+
+
 /**https://docs.maptiler.com/maplibre-gl-js/tutorials/ */
 
-/*
-const key = 'cSp27W2Q0Ud3EyJfNsz2';
 
-var bounds = [
-  [11.32, 44.48], // Southwest coordinates
-  [11.28, 44.52] // Northeast coordinates
-];
+// const key = 'jjhmmhhmzukLlOvf7UrF';
 
-const map2 = new maplibregl.Map({
-  container: 'map', // container's id or the HTML element in which MapLibre GL JS will render the map
-  style: `https://api.maptiler.com/maps/streets-v2/style.json?key=${key}`, // style URL
-  center: [11.342976, 44.496441], // starting position [lng, lat]
-  zoom: 14, // starting zoom
-  maxBounds: bounds // Sets bounds as max
-});
+// var bounds = [
+//   [11.4560, 44.4035], // Southwest coordinates
+//   [11.2294, 44.5204] // Northeast coordinates
+// ];
 
-map.fitBounds(bounds);
-*/
+
+
+// const map2 = new maplibregl.Map({
+//   container: 'map', // container's id or the HTML element in which MapLibre GL JS will render the map
+//   style: `https://api.maptiler.com/maps/streets-v2/style.json?key=${key}`, // style URL
+//   bounds: bounds,
+//   offset: [0,0],
+
+// });
+
+
+
 ///////////////////////////////////////////////////////////////
 
 var gpx = new gpxParser();
@@ -41,10 +45,10 @@ fetch('asset/percorso.gpx')
 
   let mapImage
   function preload(){
-    mapImage = loadImage('asset/map.png')
+    mapImage = loadImage('asset/map3.jpg')
   }
 function setup() {
-  createCanvas(innerWidth, innerHeight);
+  createCanvas(800, 800);
   clear()
 
   image(mapImage,0,0,width,height)
@@ -61,15 +65,15 @@ function draw() {
     // let mapLat = map(lat,44.41,44.44,0,width)
     // let mapLon = map(lon,11.37,11.43,0,height)
 
-    let mapLat = map(lat,44.4102,44.44,0,width)
-    let mapLon = map(lon,11.3700,11.4297,0,height)
+    let mapLat = map(lat,44.4426,44.3849,0,width)
+    let mapLon = map(lon,11.3569,11.4382,0,height)
 
-    vertex(mapLat,mapLon)
-    push()
-      noStroke()
-      fill(255)
-      circle(mapLat,mapLon,4)
-    pop()
+    vertex(mapLon,mapLat)
+    // push()
+    //   noStroke()
+    //   fill(255)
+    //   circle(mapLat,mapLon,4)
+    // pop()
   }
   endShape()
 
@@ -80,3 +84,4 @@ function windowResized() {
   console.log('resized')
   resizeCanvas(windowWidth, windowHeight);
 }
+
