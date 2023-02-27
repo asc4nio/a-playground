@@ -101,16 +101,14 @@ class Star {
     rotate(this.rotation)
     scale(this.life);
     //rotate(-this.rotation)
-    translate( this.x,this.y)
-    rotate(-this.rotation)
     image(
       textures[this.index],
-      0,
-      0,
+      this.x,
+      this.y,
       textures[this.index].width * starScale,
       textures[this.index].height * starScale
     );
-/*
+
     if (this.life < 0.15) { // light overlay on spawn
       this.alpha = map(this.life, 0, 0.15, 255, 0);
       fill(255, this.alpha);
@@ -130,7 +128,6 @@ class Star {
         textures[this.index].height * starScale
       );
     }
-    */
     pop();
 
     push()  // icon center 01
@@ -194,10 +191,10 @@ class Star {
   update() {
     this.life += this.increment;
 
-    this.rotation += 0.001
+    this.rotation += 0.01
 
     this.calcBB()
-    this.debugBB()
+    //this.debugBB()
 
     if (this.life > 1) { // reset cycle
       this.reset()
