@@ -45,7 +45,7 @@ function setStarScale() {
   } else {
     sizeToConsider = windowHeight;
   }
-  starScale = map(sizeToConsider, 0, 4000, 0, 2.5);
+  starScale = map(sizeToConsider, 0, 4000, 0, 2);
 }
 
 function setup() {
@@ -91,7 +91,7 @@ class Star {
     this.bbP2 = createVector()
     this.centerPoint = createVector()
 
-    this.rotation = 0
+    this.rotation = random(-4,4)
 
     this.movement
 
@@ -209,7 +209,7 @@ class Star {
   }
   update() {
     this.life += this.increment;
-    this.rotation += 0.001 *3
+    this.rotation *= 0.999
 
     this.movement = p5.Vector.fromAngle(this.rotation)
     this.movement.setMag(this.life)
@@ -217,7 +217,7 @@ class Star {
     console.log(round(this.movement.x,2),round(this.movement.y,2),round(this.movement.mag(),2),round(this.movement.heading(),2))
 
     this.calcBB()
-    this.debugBB()
+    //this.debugBB()
 
     if (this.life > 1) { // reset cycle
       this.reset()
@@ -229,5 +229,6 @@ class Star {
     this.life = 0
     this.xSpawnPos = random(-width, width);
     this.ySpawnPos = random(-height, height);
+    this.rotation = random(-4,4)
   }
 }
