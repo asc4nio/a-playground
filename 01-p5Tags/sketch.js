@@ -9,14 +9,13 @@ const strings = [
 
 const config = {
     textSize : 40,
-    tagsPerRow : 3,
-    rowsQuantity : 1
+    tagsPerRow : 4,
+    rowsQuantity : 11
 }
 
 var rows = []
 
 var increment = 0
-
 
 
 function setup() { 
@@ -34,13 +33,18 @@ function draw() {
     background(125)
 
     for (let i = 0; i < rows.length; i++) {
-        rows[i].placeTags()
+        let nextRowYPos = config.textSize*i
+        rows[i].placeTags(nextRowYPos)
         rows[i].show()
-
         rows[i].watchTag()
+
     }
 
     increment --
+
+    if(increment<=width*-1){
+        increment=0
+    }
 
 
 }
@@ -51,23 +55,23 @@ class Row {
     constructor() {
         this.tags = []
         this.currTagsPositions = []
-        this.lastTagPosition
-//        this.totalWidth
+        this.totalWidth = 0
     }
     init() {
         for (let i = 0; i < config.tagsPerRow; i++) {
             this.tags[i] = new Tag
             this.tags[i].init()
         }
+        this.calcTotalWidth()
     }
-    placeTags(){
+    placeTags(_y){
         for (let i = 0; i < this.tags.length; i++) {
             this.nextTagPosition = 0
             if (i > 0) {
                 this.prevTagPosition = this.tags[i - 1].relPosition.x
                 this.nextTagPosition = this.prevTagPosition + (this.tags[i - 1].tagWidth + this.tags[i].tagWidth)/2
             }
-            this.tags[i].place(this.nextTagPosition,0)
+            this.tags[i].place(this.nextTagPosition,_y)
             this.tags[i].move()
         }
     }
@@ -76,17 +80,17 @@ class Row {
             this.tags[i].show()
         }
     }
+    calcTotalWidth(){
+        for (let i = 0; i < this.tags.length; i++) {
+            this.totalWidth += this.tags[i].tagWidth
+        }
+    }
     watchTag(){
         for (let i = 0; i < this.tags.length; i++) {
-            this.tags[i].isOutCanvas()
-            this.currTagsPositions[i] = this.tags[i].absPosition.x
+            if(this.tags[i].isOutCanvas()){
+                this.tags[i].rePlace(this.totalWidth)
+            }
         }
-        console.log('currTagsPositions',this.currTagsPositions)
-
-        this.lastTagPosition = Math.max(...this.currTagsPositions)
-        // console.log('lastTagPos',this.lastTagPosition)
-
-
     }
   
 }
@@ -117,6 +121,8 @@ class Tag {
     move(){
         this.absPosition.x = this.relPosition.x
         this.absPosition.x += increment
+
+        this.absPosition.y = this.relPosition.y
     }
     show() {
         fill(255)
@@ -126,14 +132,15 @@ class Tag {
     }
     isOutCanvas(){
         if(this.absPosition.x < 0){
-            this.relPosition.x = 600
-            this.move()
-            this.show()
-            console.log('out', this.absPosition.x)
             return true
         } else {
             return false
         }
+    }
+    rePlace(_x){
+        this.relPosition.x += _x
+        this.move()
+        this.show()
     }
   
 }
