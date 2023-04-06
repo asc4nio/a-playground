@@ -8,8 +8,8 @@ const strings = [
 ]
 
 const config = {
-    textSize : 40,
-    tagsPerRow : 4,
+    textSize : 50,
+    tagsPerRow : 6,
     rowsQuantity : 11
 }
 
@@ -46,7 +46,6 @@ function draw() {
         increment=0
     }
 
-
 }
 
 
@@ -56,6 +55,7 @@ class Row {
         this.tags = []
         this.currTagsPositions = []
         this.totalWidth = 0
+
     }
     init() {
         for (let i = 0; i < config.tagsPerRow; i++) {
@@ -63,6 +63,7 @@ class Row {
             this.tags[i].init()
         }
         this.calcTotalWidth()
+        this.inc = random(2)
     }
     placeTags(_y){
         for (let i = 0; i < this.tags.length; i++) {
@@ -131,7 +132,7 @@ class Tag {
         text(this.string, this.absPosition.x, this.relPosition.y)
     }
     isOutCanvas(){
-        if(this.absPosition.x < 0){
+        if(this.absPosition.x < this.tagWidth/-2){
             return true
         } else {
             return false
