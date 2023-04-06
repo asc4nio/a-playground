@@ -1,127 +1,139 @@
 const strings = [
-  "anatroccolo",
-  "balena",
-  "cane",
-  "drago",
-  "elefante",
-  "furetto"
+    "anatroccolo",
+    "balena",
+    "cane",
+    "drago",
+    "elefante",
+    "furetto"
 ]
 
-const tSize = 40
-const tQuant = 10
+const config = {
+    textSize : 40,
+    tagsPerRow : 3,
+    rowsQuantity : 1
+}
 
-const rows = []
-const rQuant = 10
+var rows = []
 
-function setup() {
-  createCanvas(400, 400);
-  // background(125)
+var increment = 0
 
-  for (let i = 0; i < rQuant; i++) {
-    rows[i] = new Row()
-    rows[i].init()
-  }
 
-  console.log(rows)
+
+function setup() { 
+    createCanvas(400, 400);
+
+    for (let i = 0; i < config.rowsQuantity; i++) {
+        rows[i] = new Row()
+        rows[i].init()
+    }
+
+    // noLoop()
+}
+
+function draw() { 
+    background(125)
+
+    for (let i = 0; i < rows.length; i++) {
+        rows[i].placeTags()
+        rows[i].show()
+
+        rows[i].watchTag()
+    }
+
+    increment --
+
 
 }
 
-function draw() {
-  background(125)
-
-  for (let i = 0; i < rQuant; i++) {
-    rows[i].show(tSize*i)
-    rows[i].move()
-  }
-
-}
 
 
 class Row {
-  constructor() {
-    this.tags = []
-    this.xOffset = 0
-    this.direction = null
-  }
-  init() {
-    for (let i = 0; i < tQuant; i++) {
-      this.tags[i] = new Tag
-      this.tags[i].init()
+    constructor() {
+        this.tags = []
+        this.currTagsPositions = []
+        this.lastTagPosition
+//        this.totalWidth
     }
-    if(random(1)>0.5){
-      this.direction = true
-    } else {
-      this.direction = false
+    init() {
+        for (let i = 0; i < config.tagsPerRow; i++) {
+            this.tags[i] = new Tag
+            this.tags[i].init()
+        }
     }
-  }
-  move() {
-    if(this.direction){
-      this.xOffset += 1
-        } else {
-      this.xOffset -= 1
+    placeTags(){
+        for (let i = 0; i < this.tags.length; i++) {
+            this.nextTagPosition = 0
+            if (i > 0) {
+                this.prevTagPosition = this.tags[i - 1].relPosition.x
+                this.nextTagPosition = this.prevTagPosition + (this.tags[i - 1].tagWidth + this.tags[i].tagWidth)/2
+            }
+            this.tags[i].place(this.nextTagPosition,0)
+            this.tags[i].move()
+        }
     }
-  }
-  show(_y) {
-    push()
-    translate(0,_y)
+    show() {
+        for (let i = 0; i < this.tags.length; i++) {
+            this.tags[i].show()
+        }
+    }
+    watchTag(){
+        for (let i = 0; i < this.tags.length; i++) {
+            this.tags[i].isOutCanvas()
+            this.currTagsPositions[i] = this.tags[i].absPosition.x
+        }
+        console.log('currTagsPositions',this.currTagsPositions)
 
-    for (let i = 0; i < tQuant; i++) {
-      let prevSize = 0
-      if (i > 0) {
-        prevSize = this.tags[i - 1].bWidth / 2 + this.tags[i].bWidth / 2
-      }
-      this.tags[i].move(this.xOffset)
-      this.tags[i].show(prevSize)
+        this.lastTagPosition = Math.max(...this.currTagsPositions)
+        // console.log('lastTagPos',this.lastTagPosition)
+
 
     }
-    pop()
-  }
-
+  
 }
-
 
 class Tag {
-  constructor() {
-    this.state = null
-    this.bWidth = null
+    constructor() {
+        this.tagWidth
+        this.relPosition = createVector()
+        this.absPosition = createVector()
 
-    this.xIncrement = 0
-
-    textAlign(CENTER, CENTER)
-    textSize(tSize*0.66)
-    rectMode(CENTER)
-    noStroke()
-  }
-  init() {
-    this.sIndex = floor(random(strings.length))
-    this.string = strings[this.sIndex]
-
-    if(random(1)>0.5){
-      this.state = 'text'
-    } else {
-      this.state = 'empty'
+        textAlign(CENTER, CENTER)
+        textSize(config.textSize * 0.66)
+        rectMode(CENTER)
+        noStroke()
     }
+    init() {
+        this.stringsIndex = floor(random(strings.length))
+        this.string = strings[this.stringsIndex]
 
-    this.tWidth = textWidth(this.string)
-    this.tHeight = tSize
-    this.bWidth = this.tWidth + tSize
-  }
-  move(_x) {
-    this.xIncrement = _x
-    if(this.xIncrement > width  ){
-      this.init()
+        this.tagHeight = config.textSize
+
+        this.tagWidth = textWidth(this.string) + config.textSize
     }
-  }
-  show(_x) {
-    translate(_x , 0)
-    fill(255)
-    rect(this.xIncrement, 0, this.bWidth, this.tHeight, 50)
-    if(this.state === 'text'){
-      fill(0)
-      text(strings[this.sIndex], this.xIncrement, 0)
+    place(_x, _y) {
+        this.relPosition.x = _x
+        this.relPosition.y = _y
     }
-
-  }
-
+    move(){
+        this.absPosition.x = this.relPosition.x
+        this.absPosition.x += increment
+    }
+    show() {
+        fill(255)
+        rect(this.absPosition.x, this.absPosition.y, this.tagWidth, this.tagHeight, 50)
+        fill(0)
+        text(this.string, this.absPosition.x, this.relPosition.y)
+    }
+    isOutCanvas(){
+        if(this.absPosition.x < 0){
+            this.relPosition.x = 600
+            this.move()
+            this.show()
+            console.log('out', this.absPosition.x)
+            return true
+        } else {
+            return false
+        }
+    }
+  
 }
-
