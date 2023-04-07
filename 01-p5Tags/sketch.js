@@ -15,9 +15,6 @@ const config = {
 
 var rows = []
 
-var increment = 0
-
-
 function setup() { 
     createCanvas(400, 400);
 
@@ -40,12 +37,6 @@ function draw() {
 
     }
 
-    increment --
-
-    if(increment<=width*-1){
-        increment=0
-    }
-
 }
 
 
@@ -56,6 +47,8 @@ class Row {
         this.currTagsPositions = []
         this.totalWidth = 0
 
+        this.rSpeed
+
     }
     init() {
         for (let i = 0; i < config.tagsPerRow; i++) {
@@ -63,7 +56,9 @@ class Row {
             this.tags[i].init()
         }
         this.calcTotalWidth()
-        this.inc = random(2)
+
+        this.rSpeed = random(1.1)
+        
     }
     placeTags(_y){
         for (let i = 0; i < this.tags.length; i++) {
@@ -73,6 +68,8 @@ class Row {
                 this.nextTagPosition = this.prevTagPosition + (this.tags[i - 1].tagWidth + this.tags[i].tagWidth)/2
             }
             this.tags[i].place(this.nextTagPosition,_y)
+
+            this.tags[i].scroll(this.rSpeed)
             this.tags[i].move()
         }
     }
@@ -106,6 +103,9 @@ class Tag {
         textSize(config.textSize * 0.66)
         rectMode(CENTER)
         noStroke()
+
+        this.increment = 0
+        this.padding = 5
     }
     init() {
         this.stringsIndex = floor(random(strings.length))
@@ -114,20 +114,29 @@ class Tag {
         this.tagHeight = config.textSize
 
         this.tagWidth = textWidth(this.string) + config.textSize
+
     }
     place(_x, _y) {
         this.relPosition.x = _x
         this.relPosition.y = _y
     }
+    scroll(_speed){
+        this.increment -= _speed
+        
+        if(this.increment < -width){
+            this.increment = 0
+        }
+
+    }
     move(){
         this.absPosition.x = this.relPosition.x
-        this.absPosition.x += increment
+        this.absPosition.x += this.increment
 
         this.absPosition.y = this.relPosition.y
     }
     show() {
         fill(255)
-        rect(this.absPosition.x, this.absPosition.y, this.tagWidth, this.tagHeight, 50)
+        rect(this.absPosition.x, this.absPosition.y, this.tagWidth-this.padding, this.tagHeight-this.padding, 50)
         fill(0)
         text(this.string, this.absPosition.x, this.relPosition.y)
     }
@@ -139,7 +148,7 @@ class Tag {
         }
     }
     rePlace(_x){
-        this.relPosition.x += _x
+        this.relPosition.x = _x
         this.move()
         this.show()
     }
