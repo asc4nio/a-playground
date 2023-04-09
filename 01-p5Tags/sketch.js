@@ -1,156 +1,92 @@
-const strings = [
-    "anatroccolo",
-    "balena",
-    "cane",
-    "drago",
-    "elefante",
-    "furetto"
+const content = [
+    'albero',
+    'bordo',
+    'cuculo',
+    'dromedario'
 ]
 
-const config = {
-    textSize : 50,
-    tagsPerRow : 6,
-    rowsQuantity : 11
+var config = {
+    textSize: 40,
+    textScale : 0.66,
+    tagPadding : 5,
+    tagsPerRow : 3
 }
 
-var rows = []
+var tags = []
 
-function setup() { 
+var rowWidth = 0
+
+function setup() {
     createCanvas(400, 400);
 
-    for (let i = 0; i < config.rowsQuantity; i++) {
-        rows[i] = new Row()
-        rows[i].init()
+    for (let i = 0; i < config.tagsPerRow; i++) {
+        tags[i] = new Tag()
+        if (i==0) {
+            tags[i].place(0,0)
+        } else {
+            let prevTagXPos = tags[i-1].position.x
+            let prevTagWidth = tags[i-1].width
+            let nextTagWidth = tags[i].width
+
+            let nexTagXPos = prevTagXPos + (prevTagWidth + nextTagWidth)/2
+
+            // console.log(nexTagXPos)
+            tags[i].place(nexTagXPos ,0)
+        }
+
+        rowWidth += tags[i].width
+
+        console.log(rowWidth)
     }
 
-    // noLoop()
 }
 
-function draw() { 
+function draw() {
     background(125)
+    translate(0, height/2)
 
-    for (let i = 0; i < rows.length; i++) {
-        let nextRowYPos = config.textSize*i
-        rows[i].placeTags(nextRowYPos)
-        rows[i].show()
-        rows[i].watchTag()
-
+    for (let i = 0; i < config.tagsPerRow; i++) {
+        tags[i].show()
+        tags[i].move()
     }
 
-}
-
-
-
-class Row {
-    constructor() {
-        this.tags = []
-        this.currTagsPositions = []
-        this.totalWidth = 0
-
-        this.rSpeed
-
-    }
-    init() {
-        for (let i = 0; i < config.tagsPerRow; i++) {
-            this.tags[i] = new Tag
-            this.tags[i].init()
-        }
-        this.calcTotalWidth()
-
-        this.rSpeed = random(1.1)
-        
-    }
-    placeTags(_y){
-        for (let i = 0; i < this.tags.length; i++) {
-            this.nextTagPosition = 0
-            if (i > 0) {
-                this.prevTagPosition = this.tags[i - 1].relPosition.x
-                this.nextTagPosition = this.prevTagPosition + (this.tags[i - 1].tagWidth + this.tags[i].tagWidth)/2
-            }
-            this.tags[i].place(this.nextTagPosition,_y)
-
-            this.tags[i].scroll(this.rSpeed)
-            this.tags[i].move()
-        }
-    }
-    show() {
-        for (let i = 0; i < this.tags.length; i++) {
-            this.tags[i].show()
-        }
-    }
-    calcTotalWidth(){
-        for (let i = 0; i < this.tags.length; i++) {
-            this.totalWidth += this.tags[i].tagWidth
-        }
-    }
-    watchTag(){
-        for (let i = 0; i < this.tags.length; i++) {
-            if(this.tags[i].isOutCanvas()){
-                this.tags[i].rePlace(this.totalWidth)
-            }
-        }
-    }
-  
 }
 
 class Tag {
     constructor() {
-        this.tagWidth
-        this.relPosition = createVector()
-        this.absPosition = createVector()
-
         textAlign(CENTER, CENTER)
-        textSize(config.textSize * 0.66)
+        textSize(config.textSize*config.textScale)
         rectMode(CENTER)
         noStroke()
 
-        this.increment = 0
-        this.padding = 5
-    }
-    init() {
-        this.stringsIndex = floor(random(strings.length))
-        this.string = strings[this.stringsIndex]
+        this.position = createVector()
 
-        this.tagHeight = config.textSize
+        this.contentIndex = floor(random(content.length))
+        this.string = content[this.contentIndex]
 
-        this.tagWidth = textWidth(this.string) + config.textSize
+        this.width = floor(textWidth(this.string) + config.textSize)
+        this.height = config.textSize
 
     }
-    place(_x, _y) {
-        this.relPosition.x = _x
-        this.relPosition.y = _y
-    }
-    scroll(_speed){
-        this.increment -= _speed
-        
-        if(this.increment < -width){
-            this.increment = 0
-        }
-
+    place(_x,_y){
+        this.position.x = _x
+        this.position.y = _y
     }
     move(){
-        this.absPosition.x = this.relPosition.x
-        this.absPosition.x += this.increment
+        this.position.x --
 
-        this.absPosition.y = this.relPosition.y
-    }
-    show() {
-        fill(255)
-        rect(this.absPosition.x, this.absPosition.y, this.tagWidth-this.padding, this.tagHeight-this.padding, 50)
-        fill(0)
-        text(this.string, this.absPosition.x, this.relPosition.y)
-    }
-    isOutCanvas(){
-        if(this.absPosition.x < this.tagWidth/-2){
-            return true
-        } else {
-            return false
+        if (this.position.x < this.width/-2) {
+            this.position.x += rowWidth
         }
     }
-    rePlace(_x){
-        this.relPosition.x = _x
-        this.move()
-        this.show()
+    show() {
+        push()
+            translate(this.position.x,0)
+            fill(255)
+            rect(0,0, this.width - config.tagPadding, this.height - config.tagPadding, 50)
+            fill(0)
+            text(this.string, 0,0)
+        pop()
     }
-  
+
 }
