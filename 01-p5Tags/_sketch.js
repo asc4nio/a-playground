@@ -1,42 +1,30 @@
 const content = [
-    'anatra',
-    'balenottero',
-    'cane',
-    'dromedario',
-    'elefante',
-    'farfalla',
-    'gatto',
-    'hippo'
+    'albero',
+    'bordo',
+    'cuculo',
+    'dromedario'
 ]
 
 var config = {
     textSize: 50,
     textScale : 0.66,
     tagPadding : 5,
-    tagsPerRow : 20,
+    tagsPerRow : 8,
     rowsQuantity :9,
     tagsEmptyChance : 0.2
 }
 
 var rows = []
 
-let handImg
-let pointerV, centerV, relativeV
-
-
-function preload() {
-    handImg = loadImage('hand.png')
-}
-
 function setup() {
     createCanvas(400, 400);
+
+    // config.rowsQuantity = height/ config.textSize
 
     for (let i = 0; i < config.rowsQuantity; i++) {
         let newRowYPos = config.textSize * i
         rows[i] = new Row(newRowYPos)
     }
-
-    centerV = createVector(width / 2, height / 2);
 
 }
 
@@ -47,23 +35,6 @@ function draw() {
         rows[i].update()
     }
 
-    pointerV = createVector(mouseX, mouseY);
-    relativeV = pointerV.sub(centerV)
-  
-    let rotFromRelV = relativeV.heading()-PI*0.5
-
-    push()
-    translate(width/2, height/2)
-    rotate(rotFromRelV) 
-    translate(0, relativeV.mag())
-
-    translate(-90,-10)
-    image(handImg, 0, 0, handImg.width*0.5, handImg.height*0.5)
-
-
-    pop()
-
-
 }
 
 class Row {
@@ -71,7 +42,7 @@ class Row {
         this.tags = []
         this.rowWidth = 0
         this.yPos = _yPos
-        this.speed = random(0.5,2)
+        this.speed = random(0.1,2)
 
         for (let i = 0; i < config.tagsPerRow; i++) {
             this.tags[i] = new Tag()
@@ -145,7 +116,7 @@ class Tag {
             if(! this.isHover){
                 fill(255)
             } else {
-                fill(255,255,0)
+                fill(255,0,0)
             }
             rect(0,0, this.width - config.tagPadding, this.height - config.tagPadding, 50)
             if(!this.isEmpty){
