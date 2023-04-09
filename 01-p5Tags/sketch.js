@@ -9,47 +9,60 @@ var config = {
     textSize: 40,
     textScale : 0.66,
     tagPadding : 5,
-    tagsPerRow : 3
+    tagsPerRow : 8,
+    rowsQuantity : 11
 }
 
-var tags = []
-
-var rowWidth = 0
+var rows = []
 
 function setup() {
     createCanvas(400, 400);
 
-    for (let i = 0; i < config.tagsPerRow; i++) {
-        tags[i] = new Tag()
-        if (i==0) {
-            tags[i].place(0,0)
-        } else {
-            let prevTagXPos = tags[i-1].position.x
-            let prevTagWidth = tags[i-1].width
-            let nextTagWidth = tags[i].width
-
-            let nexTagXPos = prevTagXPos + (prevTagWidth + nextTagWidth)/2
-
-            // console.log(nexTagXPos)
-            tags[i].place(nexTagXPos ,0)
-        }
-
-        rowWidth += tags[i].width
-
-        console.log(rowWidth)
+    for (let i = 0; i < config.rowsQuantity; i++) {
+        let newRowYPos = config.textSize * i
+        rows[i] = new Row(newRowYPos)
     }
 
 }
 
 function draw() {
     background(125)
-    translate(0, height/2)
 
-    for (let i = 0; i < config.tagsPerRow; i++) {
-        tags[i].show()
-        tags[i].move()
+    for (let i = 0; i < rows.length; i++) {
+        rows[i].update()
     }
 
+}
+
+class Row {
+    constructor(_yPos) {
+        this.tags = []
+        this.rowWidth = 0
+        this.yPos = _yPos
+
+        for (let i = 0; i < config.tagsPerRow; i++) {
+            this.tags[i] = new Tag()
+            if (i==0) {
+                this.tags[i].place(0,this.yPos)
+            } else {
+                this.prevTagXPos = this.tags[i-1].position.x
+                this.prevTagWidth = this.tags[i-1].width
+                this.nextTagWidth = this.tags[i].width
+    
+                this.nexTagXPos = this.prevTagXPos + (this.prevTagWidth + this.nextTagWidth)/2
+    
+                this.tags[i].place(this.nexTagXPos ,this.yPos)
+            }
+    
+            this.rowWidth += this.tags[i].width
+        }
+    }
+    update(){
+        for (let i = 0; i < config.tagsPerRow; i++) {
+            this.tags[i].show()
+            this.tags[i].move(this.rowWidth)
+        }
+    }
 }
 
 class Tag {
@@ -72,16 +85,16 @@ class Tag {
         this.position.x = _x
         this.position.y = _y
     }
-    move(){
+    move(_width){
         this.position.x --
 
         if (this.position.x < this.width/-2) {
-            this.position.x += rowWidth
+            this.position.x += _width
         }
     }
     show() {
         push()
-            translate(this.position.x,0)
+            translate(this.position.x,this.position.y)
             fill(255)
             rect(0,0, this.width - config.tagPadding, this.height - config.tagPadding, 50)
             fill(0)
