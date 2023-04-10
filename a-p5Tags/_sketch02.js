@@ -10,11 +10,11 @@ const content = [
 ]
 
 var config = {
-    textSize: 50,
+    textSize: 60,
     textScale : 0.66,
     tagPadding : 5,
     tagsPerRow : 20,
-    rowsQuantity :9,
+    rowsQuantity :11,
     tagsEmptyChance : 0.2
 }
 
@@ -29,7 +29,7 @@ function preload() {
 }
 
 function setup() {
-    createCanvas(400, 400);
+    createCanvas(400, 600);
 
     for (let i = 0; i < config.rowsQuantity; i++) {
         let newRowYPos = config.textSize * i
@@ -117,6 +117,15 @@ class Tag {
         this.isEmpty = random(1)>config.tagsEmptyChance
         this.isHover = false
 
+        this.palette = {
+            base : color(255),
+            text : color(0),
+            hover : color(255,255,0),
+            click : color(0,255,0),
+        }
+
+        // this.isClicked = false
+
     }
     place(_x,_y){
         this.position.x = _x
@@ -135,6 +144,12 @@ class Tag {
         mouseY < this.position.y + this.height/2
         ){
             this.isHover = true
+
+            if (mouseIsPressed === true) {
+                console.log(this, 'clicked')
+            }
+
+
         } else {
             this.isHover = false
         }
@@ -143,13 +158,13 @@ class Tag {
         push()
             translate(this.position.x,this.position.y)
             if(! this.isHover){
-                fill(255)
+                fill(this.palette.base)
             } else {
-                fill(255,255,0)
+                fill(this.palette.hover)
             }
             rect(0,0, this.width - config.tagPadding, this.height - config.tagPadding, 50)
             if(!this.isEmpty){
-                fill(0)
+                fill(this.palette.text)
                 text(this.string, 0,0)
             }
 
