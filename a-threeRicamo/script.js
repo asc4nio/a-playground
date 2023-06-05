@@ -130,7 +130,7 @@ function init() {
     const planeGeometry = new THREE.PlaneGeometry(1 * (container.offsetWidth / container.offsetHeight), 1);
     const planeMaterial = new THREE.MeshBasicMaterial({ color: 0xffff00, side: THREE.DoubleSide });
     mesh = new THREE.Mesh(planeGeometry, planeMaterial);
-    mesh.scale.set(0.9, 0.9, 1)
+    // mesh.scale.set(0.9, 0.9, 1)
     scene.add(mesh);
 
 
@@ -159,6 +159,8 @@ function init() {
     });
 
     window.addEventListener('pointerup', function (event) {
+        console.log('pointerup')
+        
         draggin = false
 
         const diffX = Math.abs(event.pageX - startX);
@@ -173,8 +175,7 @@ function init() {
     });
 
     let flag = true; 
-    let moveListener = () => {
-
+    window.addEventListener('pointermove', (event)=>{
         if(draggin){
             if (flag) {
                 // Perform the desired operations here
@@ -191,8 +192,8 @@ function init() {
               }
             
         }
-    }
-    window.addEventListener('pointermove', moveListener)
+
+    })
 
 
 
