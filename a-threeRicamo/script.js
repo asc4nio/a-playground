@@ -127,10 +127,10 @@ function init() {
 
 
     //PLANE
-    const planeGeometry = new THREE.PlaneGeometry(1 *(container.offsetWidth / container.offsetHeight), 1);
+    const planeGeometry = new THREE.PlaneGeometry(1 * (container.offsetWidth / container.offsetHeight), 1);
     const planeMaterial = new THREE.MeshBasicMaterial({ color: 0xffff00, side: THREE.DoubleSide });
     mesh = new THREE.Mesh(planeGeometry, planeMaterial);
-    mesh.scale.set(0.9,0.9,1)
+    mesh.scale.set(0.9, 0.9, 1)
     scene.add(mesh);
 
 
@@ -147,10 +147,64 @@ function init() {
 
 
 
+    let draggin
+    const delta = 50;
+    let startX;
+    let startY;
+
+    window.addEventListener('pointerdown', function (event) {
+        draggin = true
+        startX = event.pageX;
+        startY = event.pageY;
+    });
+
+    window.addEventListener('pointerup', function (event) {
+        draggin = false
+
+        const diffX = Math.abs(event.pageX - startX);
+        const diffY = Math.abs(event.pageY - startY);
+
+        console.log('drag')
+
+        if (diffX < delta && diffY < delta) {
+            console.log('click')
+            // Click!
+        }
+    });
+
+    let flag = true; 
+    let moveListener = () => {
+
+        if(draggin){
+            if (flag) {
+                // Perform the desired operations here
+                console.log('movin')
+                checkIntersection(event.clientX, event.clientY);
+                if (intersection.intersects) shoot();
+
+
+                flag = false; // Set the flag to false to indicate that the function has been executed
+                
+                setTimeout(function() {
+                  flag = true; // Set the flag to true after the specified time has passed
+                }, 200); // Change the duration (in milliseconds) as per your requirement
+              }
+            
+        }
+    }
+    window.addEventListener('pointermove', moveListener)
+
+
+
+
+    /*
+
+
     window.addEventListener('pointerdown', function () {
         console.log('pointerdown')
     });
 
+    
     window.addEventListener('pointerup', function (event) {
         console.log('pointerup')
         // if (moved === false) {
@@ -172,6 +226,9 @@ function init() {
             checkIntersection(event.clientX, event.clientY);
         }
     }
+
+*/
+
 
     function checkIntersection(x, y) {
         console.log('checkIntersection', x, y)
