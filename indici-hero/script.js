@@ -9,15 +9,21 @@ import * as THREE from 'three';
 // import gsap from "gsap"
 import * as dat from 'dat.gui';
 
+// import VertexShader from './shader/vertex.glsl'
+// import FragmentShader from './shader/fragment.glsl'
+
 import { OrbitControls } from '../lib/three.js/examples/jsm/controls/OrbitControls.js';
 
 // import { EffectComposer } from '../lib/three.js/examples/jsm/postprocessing/EffectComposer.js';
 // import { RenderPass } from '../lib/three.js/examples/jsm/postprocessing/RenderPass.js';
 // import { ShaderPass } from '../lib/three.js/examples/jsm/postprocessing/ShaderPass.js';
 
-let container, camera, scene, renderer, controls
+let container, camera, scene, renderer, controls, clock
 const gui = new dat.GUI();
 let contRatio
+
+
+let shaderMaterial
 
 var isMobile = false;
 var antialias = true;
@@ -34,6 +40,8 @@ let iconsTextures = [
     './asset/icon-05.png',
 ]
 let iconsMaterials = []
+
+let bgTextureURL = './asset/bg.jpg'
 
 const params = {
     camYpos: 1.75
@@ -96,6 +104,9 @@ class Deco {
 
 
 function init() {
+    clock = new THREE.Clock()
+    const loader = new THREE.TextureLoader();
+
     var n = navigator.userAgent;
     if (n.match(/Android/i) || n.match(/webOS/i) || n.match(/iPhone/i) || n.match(/iPad/i) || n.match(/iPod/i) || n.match(/BlackBerry/i) || n.match(/Windows Phone/i)) { isMobile = true; antialias = false; }
     console.log('isMobile', isMobile)
@@ -125,8 +136,7 @@ function init() {
     if (isOrbitControl) {
         controls = new OrbitControls(camera, renderer.domElement);
         controls.minDistance = 0.75;
-        controls.maxDistance = 5;
-        // controls.target = new THREE.Vector3(0, 5, 0);
+        controls.maxDistance = 10;
 
         // controls.enablePan = false
         // controls.enableZoom = false
@@ -137,110 +147,101 @@ function init() {
         controls.enableDamping = true
         controls.dampingFactor = 0.025
 
+        controls.target = new THREE.Vector3(0, 5, 0);
         controls.target.set(camera.position.x, camera.position.y, 0);
-        // controls.autoRotate = true
-        // controls.autoRotateSpeed = 1
 
         controls.update();
     }
 
-    let setBackground = (() => {
-        /*
-                let uniforms = {
-                    colorB: { type: 'vec3', value: new THREE.Color(0x0000FF) },
-                    colorA: { type: 'vec3', value: new THREE.Color(0xFF0000) }
-                }
-        
-                function vertexShader() {
-                    return `
-                      varying vec3 vUv; 
-                  
-                      void main() {
-                        vUv = position; 
-                  
-                        vec4 modelViewPosition = modelViewMatrix * vec4(position, 1.0);
-                        gl_Position = projectionMatrix * modelViewPosition; 
-                      }              
-        
-                      
-                    `
-                }
-        
-                function fragmentShader() {
-                    return `
-                        uniform vec3 colorA; 
-                        uniform vec3 colorB; 
-                        varying vec3 vUv;
-                
-                        void main() {
-                            gl_FragColor = vec4(mix(colorA, colorB, vUv.z), 1);
-                        }
-                    `
-                }
-        
-                let shaderMaterial = new THREE.ShaderMaterial({
-                    uniforms: uniforms,
-                    fragmentShader: fragmentShader(),
-                    vertexShader: vertexShader(),
-                })
-        */
 
-/*
-        const vertexShader =
-            `
-      varying vec3 vUv; 
-  
-      void main() {
-        vUv = position; 
-  
-        vec4 modelViewPosition = modelViewMatrix * vec4(position, 1.0);
-        gl_Position = projectionMatrix * modelViewPosition; 
-      }              
+    let bgTexture = loader.load(bgTextureURL);
 
-      
-    `
-
-        const fragmentShader =
-            `
-        uniform vec3 colorA; 
-        uniform vec3 colorB; 
-        varying vec3 vUv;
-
-        void main() {
-            gl_FragColor = vec4(mix(colorA, colorB, vUv.z), 1);
-        }
-    `
-*/
-
-
-    let shaderMaterial = new THREE.RawShaderMaterial({
-        // uniforms: uniforms,
+    shaderMaterial = new THREE.RawShaderMaterial({
         vertexShader: `
             uniform mat4 projectionMatrix;
             uniform mat4 viewMatrix;
             uniform mat4 modelMatrix;
 
             attribute vec3 position;
+            attribute vec2 uv;
+
+            varying vec2 vUv;
+
 
             void main()
             {
-                gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);
+                //gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);
+
+                vec4 modelPosition = modelMatrix * vec4(position, 1.0);
+                vec4 viewPosition = viewMatrix * modelPosition;
+                vec4 projectedPosition = projectionMatrix * viewPosition;
+
+                gl_Position = projectedPosition;
+
+                vUv = uv;
+
             }
-        `,
+            `,
         fragmentShader: `
             precision mediump float;
 
+            //uniform float uTime;
+            uniform vec3 colorA;
+
+            uniform sampler2D uTexture;
+
+            varying vec2 vUv;
+
+
             void main()
             {
-                gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0 );
+                //vec4 textureColor = texture2D(uTexture, vUv);
+                
+                //gl_FragColor = textureColor;
+                //gl_FragColor = vec4(vUv, 1.0, 1.0);
+                //gl_FragColor = vec4(vUv.x, vUv.y, 1.0, 1.0);
+                //gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0 );
+
+                // float strength = vUv.y;
+                // float strength = mod(vUv.y*10.0, 1.0);
+
+                // float strength = mod(vUv.y*10.0, 1.0);
+
+                // if(strength < 0.5)
+                // {
+                //     strength = 0.0;
+                // } 
+                // else 
+                // {
+                //     strength = 1.0;
+                // }
+                //strength = strength<0.5 ? 0.0 : 1.0 ;
+                // strength = step(0.2, strength);
+
+                float gridWidth = 0.9;
+                float gridSize = 20.0;
+
+                float strength = step(gridWidth, mod(vUv.y*gridSize, 1.0));
+                strength += step(gridWidth, mod(vUv.x*gridSize, 1.0));
+
+
+                
+                gl_FragColor = vec4(strength, strength, strength, 1.0);
+
             }
         
-        `,
+            `,
+        uniforms: {
+            uTime: { value: 0 },
+            uTexture: {value: bgTexture},
+            colorB: { value: new THREE.Color(0x0000FF) },
+            colorA: { value: new THREE.Color(0xFF00FF) }
+
+        }
     })
 
-    let bgSize = 5
+    let bgSize = 10
     const bgGeometry = new THREE.PlaneGeometry(bgSize, bgSize);
-    // const bgMaterial = new THREE.MeshBasicMaterial({ color: 0xffff00, side: THREE.DoubleSide });
     const bgPlane = new THREE.Mesh(bgGeometry, shaderMaterial);
     bgPlane.position.set(0, camera.position.y, -5)
     scene.add(bgPlane);
@@ -267,53 +268,54 @@ function init() {
     scene.add(backsphere);
     */
 
-    const bgHelper = new THREE.GridHelper(5, 2, 0x888888, 0x444444)
-    bgHelper.position.set(0, camera.position.y, -5)
-    bgHelper.rotation.x = Math.PI / 2
-    scene.add(bgHelper);
-}) ()
-
-// init objects
-for (let i = 0; i < iconsTextures.length; i++) {
-    const loader = new THREE.TextureLoader();
-    loader.load(
-        // resource URL
-        iconsTextures[i],
-        // onLoad callback
-        function (texture) {
-            // in this example we create the material when the texture is loaded
-            iconsMaterials[i] = new THREE.MeshBasicMaterial({
-                map: texture,
-                transparent: true,
-            });
-            icons[i] = new Icon(i)
-        },
-        // onProgress callback currently not supported
-        undefined,
-        // onError callback
-        function (err) {
-            console.error('An error happened.');
-        }
-    );
+    // const bgHelper = new THREE.GridHelper(5, 2, 0x888888, 0x444444)
+    // bgHelper.position.set(0, camera.position.y, -5)
+    // bgHelper.rotation.x = Math.PI / 2
+    // scene.add(bgHelper);
 
 
-}
 
-for (let i = 0; i < 4; i++) {
-    decos[i] = new Deco
-}
+    // init objects
+    for (let i = 0; i < iconsTextures.length; i++) {
 
-// gui
-gui.add(params, 'camYpos', 0, 1.75);
-gui.open();
+        loader.load(
+            // resource URL
+            iconsTextures[i],
+            // onLoad callback
+            function (texture) {
+                // in this example we create the material when the texture is loaded
+                iconsMaterials[i] = new THREE.MeshBasicMaterial({
+                    map: texture,
+                    transparent: true,
+                });
+                icons[i] = new Icon(i)
+            },
+            // onProgress callback currently not supported
+            undefined,
+            // onError callback
+            function (err) {
+                console.error('An error happened.');
+            }
+        );
 
 
-//     const composer = new EffectComposer(renderer);
-//     composer.addPass(new RenderPass(scene, camera));
+    }
 
-//     const pass = new ShaderPass(drawShader);
-//     pass.renderToScreen = true;
-//     composer.addPass(pass);
+    for (let i = 0; i < 4; i++) {
+        decos[i] = new Deco
+    }
+
+    // gui
+    gui.add(params, 'camYpos', 0, 1.75);
+    gui.open();
+
+
+    //     const composer = new EffectComposer(renderer);
+    //     composer.addPass(new RenderPass(scene, camera));
+
+    //     const pass = new ShaderPass(drawShader);
+    //     pass.renderToScreen = true;
+    //     composer.addPass(pass);
 
 }
 
@@ -325,6 +327,10 @@ function animate() {
         controls.update();
         controls.target.y = camera.position.y
     }
+
+    const elapsedTime = clock.getElapsedTime()
+    shaderMaterial.uniforms.uTime = elapsedTime
+    // console.log(shaderMaterial.uniforms.uTime)
 
 
     renderer.render(scene, camera);
