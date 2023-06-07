@@ -90,18 +90,43 @@ class Icon {
 
 let decos = []
 let decoTextureURL = './asset/deco.png';
+const decoQuantity = 4;
 let decoMaterial
 class Deco {
     constructor() {
         this.geometry = new THREE.PlaneGeometry(1, 1);
         this.material = decoMaterial;
         this.plane = new THREE.Mesh(this.geometry, this.material);
-        this.plane.position.z = Math.random() * -3
+        this.plane.position.z = Math.random() * -3 -0.5
         this.plane.position.x = (Math.random() - 0.5) * 4
         this.plane.position.y = 1 - (Math.random() - 0.5) * 4
         this.plane.scale.set(0.75, 0.75, 1)
 
+        this.direction = Math.round(Math.random())
+        this.inverseDirection = false
+
         scene.add(this.plane);
+    }
+    animate() {
+        this.speed = this.direction > 0 ? 0.001 : -0.001
+
+
+        if (this.plane.position.x > 3) {
+            this.plane.position.x = 2.9
+            // console.log('out')
+            this.inverseDirection = !this.inverseDirection
+        } else if  (this.plane.position.x < -3) {
+            this.plane.position.x = -2.9
+            this.inverseDirection = !this.inverseDirection
+        }
+
+
+         if(!this.inverseDirection){
+            this.speed = this.speed*-1
+        } 
+
+
+        this.plane.position.x += this.speed
     }
 }
 
@@ -119,7 +144,7 @@ function init() {
     contRatio = container.offsetWidth / container.offsetHeight
 
     // CAMERA
-    camera = new THREE.PerspectiveCamera(fov, container.offsetWidth / container.offsetHeight, 0.25, 20);
+    camera = new THREE.PerspectiveCamera(fov, container.offsetWidth / container.offsetHeight, 0.25, 50);
     camera.position.set(0, params.camYpos, 5);
     fitCamera(camera, container.offsetWidth, container.offsetHeight);
 
@@ -201,80 +226,53 @@ function init() {
                 //vec4 textureColor = texture2D(uTexture, vUv);
                 
                 //gl_FragColor = textureColor;
-                //gl_FragColor = vec4(vUv, 1.0, 1.0);
                 //gl_FragColor = vec4(vUv.x, vUv.y, 1.0, 1.0);
-                //gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0 );
 
-                // float strength = vUv.y;
-                // float strength = mod(vUv.y*10.0, 1.0);
+                vec3 colorRed = vec3(0.725,0.016,0.42);
+                vec3 colorBlue = vec3(0.506,0.012,0.89);
 
-                // float strength = mod(vUv.y*10.0, 1.0);
-
-                // if(strength < 0.5)
-                // {
-                //     strength = 0.0;
-                // } 
-                // else 
-                // {
-                //     strength = 1.0;
-                // }
-                //strength = strength<0.5 ? 0.0 : 1.0 ;
-                // strength = step(0.2, strength);
 
                 float gridWidth = 0.9;
                 float gridSize = 20.0;
+                float grid = step(gridWidth, mod(vUv.y*gridSize, 1.0));
+                grid += step(gridWidth, mod(vUv.x*gridSize, 1.0));
 
-                float strength = step(gridWidth, mod(vUv.y*gridSize, 1.0));
-                strength += step(gridWidth, mod(vUv.x*gridSize, 1.0));
+                grid = clamp(grid, 0.0, 1.0);
 
-                float bgGradient = vUv.y;
-
-                float result = bgGradient + strength;
+                vec2 wavedUv = vec2(vUv.x, vUv.y + sin(vUv.x*5.0)*0.1);
 
 
-                gl_FragColor = vec4(result, result, result, 1.0);
+                // float bgGradient = vUv.y;
 
-                // gl_FragColor = vec4(strength, strength, strength, 1.0);
+                float bgGradient = sin(wavedUv.y*10.0) +1.0 /2.0;
+
+                vec3 mixedColors = mix(colorRed, colorBlue, bgGradient);
+
+                vec3 result = mixedColors + grid*0.5 ;
+
+
+                gl_FragColor = vec4(result, 1.0);
+
 
             }
         
             `,
         uniforms: {
             uTime: { value: 0 },
-            uTexture: {value: bgTexture},
+            uTexture: { value: bgTexture },
             colorB: { value: new THREE.Color(0x0000FF) },
             colorA: { value: new THREE.Color(0xFF00FF) }
 
         }
     })
 
-    let bgSize = 10
+    let bgSize = 20
     const bgGeometry = new THREE.PlaneGeometry(bgSize, bgSize);
     const bgPlane = new THREE.Mesh(bgGeometry, shaderMaterial);
-    bgPlane.position.set(0, camera.position.y, -5)
+    bgPlane.position.set(0, camera.position.y, -20)
     scene.add(bgPlane);
 
 
-    /*
-    function gradTexture(color) {
-        var c = document.createElement("canvas");
-        var ct = c.getContext("2d");
-        var size = 1024;
-        c.width = 16; c.height = size;
-        var gradient = ct.createLinearGradient(0, 0, 0, size);
-        var i = color[0].length;
-        while (i--) { gradient.addColorStop(color[0][i], color[1][i]); }
-        ct.fillStyle = gradient;
-        ct.fillRect(0, 0, 16, size);
-        var texture = new THREE.Texture(c);
-        texture.needsUpdate = true;
-        return texture;
-    }
-    const backgeometry = new THREE.SphereGeometry(4, 32, 16);
-    const backmaterial = new THREE.MeshBasicMaterial({ map: gradTexture([[0.75, 0.6, 0.4, 0.25], ['#1B1D1E', '#3D4143', '#72797D', '#b0babf']]), side: THREE.BackSide, depthWrite: false, fog: false })
-    const backsphere = new THREE.Mesh(backgeometry, backmaterial);
-    scene.add(backsphere);
-    */
 
     // const bgHelper = new THREE.GridHelper(5, 2, 0x888888, 0x444444)
     // bgHelper.position.set(0, camera.position.y, -5)
@@ -321,7 +319,7 @@ function init() {
                 transparent: true,
             });
 
-            for (let i = 0; i < 4; i++) {
+            for (let i = 0; i < decoQuantity; i++) {
                 decos[i] = new Deco
             }
         },
@@ -338,7 +336,7 @@ function init() {
 
 
     // gui
-    gui.add(params, 'camYpos', 0, 1.75);
+    gui.add(params, 'camYpos', 0, 1.75, 0.0001);
     gui.open();
 
 
@@ -368,8 +366,11 @@ function animate() {
     renderer.render(scene, camera);
 
 
-    for (let item of icons) {
-        item.rotate()
+    for (let icon of icons) {
+        icon.rotate()
+    }
+    for (let deco of decos) {
+        deco.animate()
     }
 
     //gui update
