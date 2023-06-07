@@ -12,7 +12,7 @@ import * as dat from 'dat.gui';
 // import VertexShader from './shader/vertex.glsl'
 // import FragmentShader from './shader/fragment.glsl'
 
-import { OrbitControls } from '../lib/three.js/examples/jsm/controls/OrbitControls.js';
+import { OrbitControls } from 'threeAddon/controls/OrbitControls.js';
 
 // import { EffectComposer } from '../lib/three.js/examples/jsm/postprocessing/EffectComposer.js';
 // import { RenderPass } from '../lib/three.js/examples/jsm/postprocessing/RenderPass.js';
@@ -53,18 +53,20 @@ class Icon {
     constructor(i) {
         this.geometry = new THREE.PlaneGeometry(1, 1);
         this.mesh = new THREE.Mesh(this.geometry, iconsMaterials[i]);
+        this.mesh.position.set(-2, 0, 0)
 
-        this.pivot = new THREE.Group();
 
         this.rotation = (Math.PI / iconsTextures.length) * i
+        this.rotationSpeed = 0.001
 
-        this.mesh.position.set(-2, 0, 0)
-        this.mesh.rotation.z = this.rotation
+        this.balanceRotation = new THREE.Group();
+        this.balanceRotation.rotation.z = this.rotation
+        this.balanceRotation.add(this.mesh);
 
-        this.pivot.add(this.mesh);
+        this.pivot = new THREE.Group();
+        this.pivot.add(this.balanceRotation);
         this.pivot.rotation.z = -this.rotation
 
-        this.rotationSpeed = 0.001
 
         scene.add(this.pivot);
     }
@@ -83,6 +85,10 @@ class Icon {
         if (this.rotation > maxRot) {
             this.rotation = 0
         }
+
+    }
+    watchCamera(){
+        this.mesh.lookAt( camera.position );
     }
 
 }
@@ -368,8 +374,8 @@ function animate() {
     renderer.render(scene, camera);
 
 
-    for (let item of icons) {
-        item.rotate()
+    for (let icon of icons) {
+        icon.rotate()
     }
 
     //gui update

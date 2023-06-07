@@ -6,11 +6,9 @@
  */
 
 import * as THREE from 'three';
-// import gsap from "gsap"
+import gsap from "gsap"
 import * as dat from 'dat.gui';
 
-// import VertexShader from './shader/vertex.glsl'
-// import FragmentShader from './shader/fragment.glsl'
 
 import { OrbitControls } from '../lib/three.js/examples/jsm/controls/OrbitControls.js';
 
@@ -18,9 +16,8 @@ import { OrbitControls } from '../lib/three.js/examples/jsm/controls/OrbitContro
 // import { RenderPass } from '../lib/three.js/examples/jsm/postprocessing/RenderPass.js';
 // import { ShaderPass } from '../lib/three.js/examples/jsm/postprocessing/ShaderPass.js';
 
-let container, camera, scene, renderer, controls, clock
+let container, contRatio, camera, scene, renderer, controls, clock
 const gui = new dat.GUI();
-let contRatio
 
 
 let shaderMaterial
@@ -53,14 +50,13 @@ class Icon {
     constructor(i) {
         this.geometry = new THREE.PlaneGeometry(1, 1);
         this.mesh = new THREE.Mesh(this.geometry, iconsMaterials[i]);
-
-        this.pivot = new THREE.Group();
+        this.mesh.position.set(-2, 0, 0)
 
         this.rotation = (Math.PI / iconsTextures.length) * i
 
-        this.mesh.position.set(-2, 0, 0)
         this.mesh.rotation.z = this.rotation
 
+        this.pivot = new THREE.Group();
         this.pivot.add(this.mesh);
         this.pivot.rotation.z = -this.rotation
 
@@ -69,6 +65,8 @@ class Icon {
         scene.add(this.pivot);
     }
     rotate() {
+        this.mesh.lookAt(camera.position)
+
         this.rotation = this.rotation + this.rotationSpeed
 
         let maxRot = Math.PI
@@ -90,14 +88,14 @@ class Icon {
 
 let decos = []
 let decoTextureURL = './asset/deco.png';
-const decoQuantity = 4;
+const decoQuantity = 8;
 let decoMaterial
 class Deco {
     constructor() {
         this.geometry = new THREE.PlaneGeometry(1, 1);
         this.material = decoMaterial;
         this.plane = new THREE.Mesh(this.geometry, this.material);
-        this.plane.position.z = Math.random() * -3 -0.5
+        this.plane.position.z = Math.random() * -3 - 0.5
         this.plane.position.x = (Math.random() - 0.5) * 4
         this.plane.position.y = 1 - (Math.random() - 0.5) * 4
         this.plane.scale.set(0.75, 0.75, 1)
@@ -115,15 +113,15 @@ class Deco {
             this.plane.position.x = 2.9
             // console.log('out')
             this.inverseDirection = !this.inverseDirection
-        } else if  (this.plane.position.x < -3) {
+        } else if (this.plane.position.x < -3) {
             this.plane.position.x = -2.9
             this.inverseDirection = !this.inverseDirection
         }
 
 
-         if(!this.inverseDirection){
-            this.speed = this.speed*-1
-        } 
+        if (!this.inverseDirection) {
+            this.speed = this.speed * -1
+        }
 
 
         this.plane.position.x += this.speed
@@ -213,12 +211,58 @@ function init() {
         fragmentShader: `
             precision mediump float;
 
-            //uniform float uTime;
+            uniform float uTime;
             uniform vec3 colorA;
 
             uniform sampler2D uTexture;
 
             varying vec2 vUv;
+
+
+            //
+            //	Classic Perlin 2D Noise 
+            //	by Stefan Gustavson
+            //
+            vec4 permute(vec4 x)
+            {
+                return mod(((x*34.0)+1.0)*x, 289.0);
+            }
+
+            vec2 fade(vec2 t) {return t*t*t*(t*(t*6.0-15.0)+10.0);}
+
+            float cnoise(vec2 P){
+                vec4 Pi = floor(P.xyxy) + vec4(0.0, 0.0, 1.0, 1.0);
+                vec4 Pf = fract(P.xyxy) - vec4(0.0, 0.0, 1.0, 1.0);
+                Pi = mod(Pi, 289.0); // To avoid truncation effects in permutation
+                vec4 ix = Pi.xzxz;
+                vec4 iy = Pi.yyww;
+                vec4 fx = Pf.xzxz;
+                vec4 fy = Pf.yyww;
+                vec4 i = permute(permute(ix) + iy);
+                vec4 gx = 2.0 * fract(i * 0.0243902439) - 1.0; // 1/41 = 0.024...
+                vec4 gy = abs(gx) - 0.5;
+                vec4 tx = floor(gx + 0.5);
+                gx = gx - tx;
+                vec2 g00 = vec2(gx.x,gy.x);
+                vec2 g10 = vec2(gx.y,gy.y);
+                vec2 g01 = vec2(gx.z,gy.z);
+                vec2 g11 = vec2(gx.w,gy.w);
+                vec4 norm = 1.79284291400159 - 0.85373472095314 * 
+                    vec4(dot(g00, g00), dot(g01, g01), dot(g10, g10), dot(g11, g11));
+                g00 *= norm.x;
+                g01 *= norm.y;
+                g10 *= norm.z;
+                g11 *= norm.w;
+                float n00 = dot(g00, vec2(fx.x, fy.x));
+                float n10 = dot(g10, vec2(fx.y, fy.y));
+                float n01 = dot(g01, vec2(fx.z, fy.z));
+                float n11 = dot(g11, vec2(fx.w, fy.w));
+                vec2 fade_xy = fade(Pf.xy);
+                vec2 n_x = mix(vec2(n00, n01), vec2(n10, n11), fade_xy.x);
+                float n_xy = mix(n_x.x, n_x.y, fade_xy.y);
+                return 2.3 * n_xy;
+            }
+            //
 
 
             void main()
@@ -232,26 +276,29 @@ function init() {
                 vec3 colorBlue = vec3(0.506,0.012,0.89);
 
 
-                float gridWidth = 0.9;
+                float gridWidth = 0.97;
                 float gridSize = 20.0;
                 float grid = step(gridWidth, mod(vUv.y*gridSize, 1.0));
                 grid += step(gridWidth, mod(vUv.x*gridSize, 1.0));
 
+                float noise = cnoise(vUv*50.0);
+                grid *= noise+0.5;
                 grid = clamp(grid, 0.0, 1.0);
+
 
                 vec2 wavedUv = vec2(vUv.x, vUv.y + sin(vUv.x*5.0)*0.1);
 
-
                 // float bgGradient = vUv.y;
-
-                float bgGradient = sin(wavedUv.y*10.0) +1.0 /2.0;
+                float bgGradient = sin(wavedUv.y*5.0) +1.0 /2.0;
 
                 vec3 mixedColors = mix(colorRed, colorBlue, bgGradient);
 
-                vec3 result = mixedColors + grid*0.5 ;
+                vec3 result = mixedColors + grid*0.3 ;
 
 
                 gl_FragColor = vec4(result, 1.0);
+                // gl_FragColor = vec4(noise,noise,noise, 1.0);
+
 
 
             }
@@ -271,13 +318,6 @@ function init() {
     const bgPlane = new THREE.Mesh(bgGeometry, shaderMaterial);
     bgPlane.position.set(0, camera.position.y, -20)
     scene.add(bgPlane);
-
-
-
-    // const bgHelper = new THREE.GridHelper(5, 2, 0x888888, 0x444444)
-    // bgHelper.position.set(0, camera.position.y, -5)
-    // bgHelper.rotation.x = Math.PI / 2
-    // scene.add(bgHelper);
 
 
 
@@ -339,13 +379,16 @@ function init() {
     gui.add(params, 'camYpos', 0, 1.75, 0.0001);
     gui.open();
 
+    var obj = { animateCamera: function () { gsap.to(params, { camYpos: 0, duration: 4 }) } };
+    gui.add(obj, 'animateCamera');
 
-    //     const composer = new EffectComposer(renderer);
-    //     composer.addPass(new RenderPass(scene, camera));
 
-    //     const pass = new ShaderPass(drawShader);
-    //     pass.renderToScreen = true;
-    //     composer.addPass(pass);
+    // const composer = new EffectComposer(renderer);
+    // composer.addPass(new RenderPass(scene, camera));
+
+    // const pass = new ShaderPass(shaderMaterial);
+    // pass.renderToScreen = true;
+    // composer.addPass(pass);
 
 }
 
