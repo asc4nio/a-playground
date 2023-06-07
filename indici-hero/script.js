@@ -1,36 +1,55 @@
+/**
+ * https://jsfiddle.net/f486o0sn/4/
+ * https://www.shadertoy.com/view/MscSDf
+ * https://www.shadertoy.com/view/4dBSRK
+ * https://www.shadertoy.com/view/wstGz4
+ */
+
 import * as THREE from 'three';
-import gsap from "gsap"
-// import * as dat from 'dat.gui';
-// import { OrbitControls } from '../lib/three.js/examples/jsm/controls/OrbitControls.js';
+// import gsap from "gsap"
+import * as dat from 'dat.gui';
+
+import { OrbitControls } from '../lib/three.js/examples/jsm/controls/OrbitControls.js';
+
+// import { EffectComposer } from '../lib/three.js/examples/jsm/postprocessing/EffectComposer.js';
+// import { RenderPass } from '../lib/three.js/examples/jsm/postprocessing/RenderPass.js';
+// import { ShaderPass } from '../lib/three.js/examples/jsm/postprocessing/ShaderPass.js';
 
 let container, camera, scene, renderer, controls
+const gui = new dat.GUI();
+let contRatio
+
+var isMobile = false;
+var antialias = true;
+const isOrbitControl = true
+
 
 let icons = []
-let textures = [
+let decos = []
+let iconsTextures = [
     './asset/icon-01.png',
     './asset/icon-02.png',
     './asset/icon-03.png',
     './asset/icon-04.png',
     './asset/icon-05.png',
-    './asset/icon-06.png',
 ]
-let iconsQuantity = textures.length
-let materials = []
+let iconsMaterials = []
 
-// const gui = new dat.GUI();
+const params = {
+    camYpos: 1.75
+};
 
-let fitCamera
 const planeAspectRatio = 1
 const fov = 35
 
 class Icon {
     constructor(i) {
         this.geometry = new THREE.PlaneGeometry(1, 1);
-        this.mesh = new THREE.Mesh(this.geometry, materials[i]);
+        this.mesh = new THREE.Mesh(this.geometry, iconsMaterials[i]);
 
         this.pivot = new THREE.Group();
 
-        this.rotation = (Math.PI / iconsQuantity) * i
+        this.rotation = (Math.PI / iconsTextures.length) * i
 
         this.mesh.position.set(-2, 0, 0)
         this.mesh.rotation.z = this.rotation
@@ -47,8 +66,8 @@ class Icon {
 
         let maxRot = Math.PI
 
-        let xRepos = Math.sin(this.rotation)-3
-        
+        let xRepos = Math.sin(this.rotation) - 3
+
         this.mesh.position.set(xRepos, 0, 0)
 
         this.mesh.rotation.z = this.rotation
@@ -61,125 +80,252 @@ class Icon {
 
 }
 
+class Deco {
+    constructor() {
+        this.geometry = new THREE.PlaneGeometry(1, 1);
+        this.material = new THREE.MeshBasicMaterial({ color: 0xffff00, side: THREE.DoubleSide });
+        this.plane = new THREE.Mesh(this.geometry, this.material);
+        this.plane.position.z = Math.random() * -3
+        this.plane.position.x = (Math.random() - 0.5) * 4
+        this.plane.position.y = 1 - (Math.random() - 0.5) * 4
+        this.plane.scale.set(0.5, 0.5, 1)
 
+        scene.add(this.plane);
+    }
+}
 
 
 function init() {
+    var n = navigator.userAgent;
+    if (n.match(/Android/i) || n.match(/webOS/i) || n.match(/iPhone/i) || n.match(/iPad/i) || n.match(/iPod/i) || n.match(/BlackBerry/i) || n.match(/Windows Phone/i)) { isMobile = true; antialias = false; }
+    console.log('isMobile', isMobile)
+
     container = document.querySelector('#threejs')
-
     console.log(container.offsetWidth, container.offsetHeight)
-
+    contRatio = container.offsetWidth / container.offsetHeight
 
     // CAMERA
     camera = new THREE.PerspectiveCamera(fov, container.offsetWidth / container.offsetHeight, 0.25, 20);
-    camera.position.set(0, 1.5, 5);
-    fitCamera = (camera, contWidth, contHeight) => {
-        camera.aspect = contWidth / contHeight;
-
-        if (camera.aspect > planeAspectRatio) {
-            // window too large
-
-            const cameraHeight = Math.tan(THREE.MathUtils.degToRad(fov / 2));
-            const ratio = camera.aspect / planeAspectRatio;
-            const newCameraHeight = cameraHeight / ratio;
-            camera.fov = THREE.MathUtils.radToDeg(Math.atan(newCameraHeight)) * 2;
-
-
-        } else {
-            // window too narrow
-            camera.fov = fov;
-
-        }
-
-        camera.updateProjectionMatrix();
-    };
+    camera.position.set(0, params.camYpos, 5);
     fitCamera(camera, container.offsetWidth, container.offsetHeight);
-
 
     // SCENE
     scene = new THREE.Scene();
-
     scene.add(new THREE.GridHelper(4, 12, 0x888888, 0x444444)); //helper
 
-
     // RENDERER
-    renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer = new THREE.WebGLRenderer({ antialias: antialias });
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(container.offsetWidth, container.offsetHeight);
-    renderer.setClearColor( 0xff00ff, 1);
-
-
+    // renderer.setClearColor(0xff00ff, 1);
 
     container.appendChild(renderer.domElement);
 
-    /*
 
-    controls = new OrbitControls(camera, renderer.domElement);
-    controls.minDistance = 0.75;
-    controls.maxDistance = 5;
-    // controls.target = new THREE.Vector3(0, 5, 0);
+    if (isOrbitControl) {
+        controls = new OrbitControls(camera, renderer.domElement);
+        controls.minDistance = 0.75;
+        controls.maxDistance = 5;
+        // controls.target = new THREE.Vector3(0, 5, 0);
 
+        // controls.enablePan = false
+        // controls.enableZoom = false
 
-    // controls.enablePan = false
-    // controls.enableZoom = false
+        // controls.minPolarAngle = Math.PI * 0.25 // fix vertical rotation
+        // controls.maxPolarAngle = Math.PI * 0.75 // fix vertical rotation
 
-    // controls.minPolarAngle = Math.PI * 0.25 // fix vertical rotation
-    // controls.maxPolarAngle = Math.PI * 0.75 // fix vertical rotation
+        controls.enableDamping = true
+        controls.dampingFactor = 0.025
 
-    controls.enableDamping = true
-    controls.dampingFactor = 0.025
+        controls.target.set(camera.position.x, camera.position.y, 0);
+        // controls.autoRotate = true
+        // controls.autoRotateSpeed = 1
 
-    // controls.target.set( 0, 0, - 0.2 );
-    // controls.autoRotate = true
-    // controls.autoRotateSpeed = 1
+        controls.update();
+    }
 
-    controls.update();
+    let setBackground = (() => {
+        /*
+                let uniforms = {
+                    colorB: { type: 'vec3', value: new THREE.Color(0x0000FF) },
+                    colorA: { type: 'vec3', value: new THREE.Color(0xFF0000) }
+                }
+        
+                function vertexShader() {
+                    return `
+                      varying vec3 vUv; 
+                  
+                      void main() {
+                        vUv = position; 
+                  
+                        vec4 modelViewPosition = modelViewMatrix * vec4(position, 1.0);
+                        gl_Position = projectionMatrix * modelViewPosition; 
+                      }              
+        
+                      
+                    `
+                }
+        
+                function fragmentShader() {
+                    return `
+                        uniform vec3 colorA; 
+                        uniform vec3 colorB; 
+                        varying vec3 vUv;
+                
+                        void main() {
+                            gl_FragColor = vec4(mix(colorA, colorB, vUv.z), 1);
+                        }
+                    `
+                }
+        
+                let shaderMaterial = new THREE.ShaderMaterial({
+                    uniforms: uniforms,
+                    fragmentShader: fragmentShader(),
+                    vertexShader: vertexShader(),
+                })
+        */
+
+/*
+        const vertexShader =
+            `
+      varying vec3 vUv; 
+  
+      void main() {
+        vUv = position; 
+  
+        vec4 modelViewPosition = modelViewMatrix * vec4(position, 1.0);
+        gl_Position = projectionMatrix * modelViewPosition; 
+      }              
+
+      
+    `
+
+        const fragmentShader =
+            `
+        uniform vec3 colorA; 
+        uniform vec3 colorB; 
+        varying vec3 vUv;
+
+        void main() {
+            gl_FragColor = vec4(mix(colorA, colorB, vUv.z), 1);
+        }
+    `
 */
 
 
+    let shaderMaterial = new THREE.RawShaderMaterial({
+        // uniforms: uniforms,
+        vertexShader: `
+            uniform mat4 projectionMatrix;
+            uniform mat4 viewMatrix;
+            uniform mat4 modelMatrix;
 
+            attribute vec3 position;
 
-    for (let i = 0; i < iconsQuantity; i++) {
-        const loader = new THREE.TextureLoader();
-        loader.load(
-            // resource URL
-            textures[i],
-
-            // onLoad callback
-            function (texture) {
-                // in this example we create the material when the texture is loaded
-                materials[i] = new THREE.MeshBasicMaterial({
-                    map: texture,
-                    transparent: true,
-
-                });
-
-                icons[i] = new Icon(i)
-            },
-
-            // onProgress callback currently not supported
-            undefined,
-
-            // onError callback
-            function (err) {
-                console.error('An error happened.');
+            void main()
+            {
+                gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);
             }
-        );
+        `,
+        fragmentShader: `
+            precision mediump float;
+
+            void main()
+            {
+                gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0 );
+            }
+        
+        `,
+    })
+
+    let bgSize = 5
+    const bgGeometry = new THREE.PlaneGeometry(bgSize, bgSize);
+    // const bgMaterial = new THREE.MeshBasicMaterial({ color: 0xffff00, side: THREE.DoubleSide });
+    const bgPlane = new THREE.Mesh(bgGeometry, shaderMaterial);
+    bgPlane.position.set(0, camera.position.y, -5)
+    scene.add(bgPlane);
 
 
-        // icons[i] = new Icon(i)
-        // icons[i].place(i)
-
+    /*
+    function gradTexture(color) {
+        var c = document.createElement("canvas");
+        var ct = c.getContext("2d");
+        var size = 1024;
+        c.width = 16; c.height = size;
+        var gradient = ct.createLinearGradient(0, 0, 0, size);
+        var i = color[0].length;
+        while (i--) { gradient.addColorStop(color[0][i], color[1][i]); }
+        ct.fillStyle = gradient;
+        ct.fillRect(0, 0, 16, size);
+        var texture = new THREE.Texture(c);
+        texture.needsUpdate = true;
+        return texture;
     }
+    const backgeometry = new THREE.SphereGeometry(4, 32, 16);
+    const backmaterial = new THREE.MeshBasicMaterial({ map: gradTexture([[0.75, 0.6, 0.4, 0.25], ['#1B1D1E', '#3D4143', '#72797D', '#b0babf']]), side: THREE.BackSide, depthWrite: false, fog: false })
+    const backsphere = new THREE.Mesh(backgeometry, backmaterial);
+    scene.add(backsphere);
+    */
 
-    // icons[0] = new Icon
-    // icons[0].place()
+    const bgHelper = new THREE.GridHelper(5, 2, 0x888888, 0x444444)
+    bgHelper.position.set(0, camera.position.y, -5)
+    bgHelper.rotation.x = Math.PI / 2
+    scene.add(bgHelper);
+}) ()
+
+// init objects
+for (let i = 0; i < iconsTextures.length; i++) {
+    const loader = new THREE.TextureLoader();
+    loader.load(
+        // resource URL
+        iconsTextures[i],
+        // onLoad callback
+        function (texture) {
+            // in this example we create the material when the texture is loaded
+            iconsMaterials[i] = new THREE.MeshBasicMaterial({
+                map: texture,
+                transparent: true,
+            });
+            icons[i] = new Icon(i)
+        },
+        // onProgress callback currently not supported
+        undefined,
+        // onError callback
+        function (err) {
+            console.error('An error happened.');
+        }
+    );
 
 
 }
 
+for (let i = 0; i < 4; i++) {
+    decos[i] = new Deco
+}
+
+// gui
+gui.add(params, 'camYpos', 0, 1.75);
+gui.open();
+
+
+//     const composer = new EffectComposer(renderer);
+//     composer.addPass(new RenderPass(scene, camera));
+
+//     const pass = new ShaderPass(drawShader);
+//     pass.renderToScreen = true;
+//     composer.addPass(pass);
+
+}
+
+
+
+
 function animate() {
-    // controls.update();
+    if (isOrbitControl) {
+        controls.update();
+        controls.target.y = camera.position.y
+    }
+
 
     renderer.render(scene, camera);
 
@@ -188,9 +334,29 @@ function animate() {
         item.rotate()
     }
 
+    //gui update
+    camera.position.y = params.camYpos
+
     requestAnimationFrame(animate);
 
 }
+
+function fitCamera(camera, contWidth, contHeight) {
+    console.log('fitCamera')
+    camera.aspect = contWidth / contHeight;
+
+    if (camera.aspect > planeAspectRatio) {
+        // window too large
+        const cameraHeight = Math.tan(THREE.MathUtils.degToRad(fov / 2));
+        const ratio = camera.aspect / planeAspectRatio;
+        const newCameraHeight = cameraHeight / ratio;
+        camera.fov = THREE.MathUtils.radToDeg(Math.atan(newCameraHeight)) * 2;
+    } else {
+        // window too narrow
+        camera.fov = fov;
+    }
+    camera.updateProjectionMatrix();
+};
 
 function onWindowResize() {
     // camera.aspect = container.offsetWidth / container.offsetHeight;
@@ -201,7 +367,6 @@ function onWindowResize() {
     renderer.setSize(container.offsetWidth, container.offsetHeight);
 }
 window.addEventListener('resize', onWindowResize);
-
 
 
 init();
