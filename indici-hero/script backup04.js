@@ -14,10 +14,6 @@ import { OrbitControls } from '../lib/three.js/examples/jsm/controls/OrbitContro
 import gsap from "gsap"
 import * as dat from 'dat.gui';
 
-window.threeState = {
-    iconsMaterialsLoaded: false
-}
-
 
 let container, contRatio, camera, scene, renderer, controls, clock
 const gui = new dat.GUI();
@@ -41,59 +37,44 @@ const params = {
 let bgTextureURL = './asset/bg.jpg';
 
 let icons = []
-window.iconsMaterials = []
+let iconsTextures = [
+    './asset/icon-01.png',
+    './asset/icon-02.png',
+    './asset/icon-03.png',
+    './asset/icon-04.png',
+    './asset/icon-05.png',
+]
+let iconsMaterials = []
 class Icon {
     constructor(i) {
         this.geometry = new THREE.PlaneGeometry(1, 1);
-        this.rotation = (Math.PI / iconsMaterials.length) * i
+        this.mesh = new THREE.Mesh(this.geometry, iconsMaterials[i]);
+        this.mesh.position.set(-2, 0, 0)
+
+        this.rotation = (Math.PI / iconsTextures.length) * i
+
+        this.mesh.rotation.z = this.rotation
+
         this.pivot = new THREE.Group();
-        this.meshes = []
-
-        this.offset= 0.1
-
-        for (let j = 0; j < iconsMaterials[i].length; j++) {
-            
-            let mesh = new THREE.Mesh(this.geometry, iconsMaterials[i][j]);
-            mesh.position.set(-2, 0, this.offset * j)
-            mesh.rotation.z = this.rotation
-
-            this.meshes = [...this.meshes, mesh]
-            this.pivot.add(mesh)
-
-            // if (this.meshes.length === iconsMaterials[i].length) {
-            //     this.pivot.add(this.meshes);
-            // }
-
-        }
-
-
-        // this.mesh = new THREE.Mesh(this.geometry, iconsMaterials[i][0]);
-        // this.mesh.position.set(-2, 0, 0)
-
-
-        // this.mesh.rotation.z = this.rotation
-
-
-        // this.pivot.add(this.mesh);
-
+        this.pivot.add(this.mesh);
         this.pivot.rotation.z = -this.rotation
+
         this.rotationSpeed = 0.001
 
         scene.add(this.pivot);
     }
     rotate() {
+        this.mesh.lookAt(camera.position)
+
         this.rotation = this.rotation + this.rotationSpeed
 
         let maxRot = Math.PI
 
         let xRepos = Math.sin(this.rotation) - 3
 
-        for (let mesh of this.meshes) {
-            mesh.lookAt(camera.position)
-            mesh.position.x= xRepos
-            // mesh.position.set(xRepos, 0, 0)
-            mesh.rotation.z = this.rotation
-        }
+        this.mesh.position.set(xRepos, 0, 0)
+
+        this.mesh.rotation.z = this.rotation
         this.pivot.rotation.z = -this.rotation
 
         if (this.rotation > maxRot) {
@@ -146,24 +127,12 @@ class Deco {
     }
 }
 
-///////////////////////////////////////////////////////////////////////////////////
-
-
-import { loadIconsMaterials } from './loadTexture.js'
 
 
 ///////////////////////////////////////////////////////////////////////////////////
-
-
-
-
 
 
 function init() {
-
-    loadIconsMaterials()
-
-
     clock = new THREE.Clock()
     const checkIfMobile = (() => {
         var n = navigator.userAgent;
@@ -359,28 +328,27 @@ function init() {
 
     const setObjects = (() => {
         // init icons
-        // for (let i = 0; i < iconsTextures.length; i++) {
+        for (let i = 0; i < iconsTextures.length; i++) {
 
-        //     loader.load(
-        //         iconsTextures[i],
-        //         // onLoad callback
-        //         function (texture) {
-        //             iconsMaterials[i] = new THREE.MeshBasicMaterial({
-        //                 map: texture,
-        //                 transparent: true,
-        //             });
-        //             icons[i] = new Icon(i)
-        //         },
-        //         // onProgress callback currently not supported
-        //         undefined,
-        //         // onError callback
-        //         function (err) {
-        //             console.error('An error happened.');
-        //         }
-        //     );
+            loader.load(
+                iconsTextures[i],
+                // onLoad callback
+                function (texture) {
+                    iconsMaterials[i] = new THREE.MeshBasicMaterial({
+                        map: texture,
+                        transparent: true,
+                    });
+                    icons[i] = new Icon(i)
+                },
+                // onProgress callback currently not supported
+                undefined,
+                // onError callback
+                function (err) {
+                    console.error('An error happened.');
+                }
+            );
 
-        // }
-
+        }
 
         // init decos
         const decoTexture = loader.load(
@@ -423,22 +391,14 @@ function init() {
     animate();
 }
 
+
+
+
 function animate() {
-
-    if(!threeState.iconsMaterialsLoaded){
-        console.log('threeState.iconsMaterialsLoaded', threeState.iconsMaterialsLoaded)
-    }
-
-    if (threeState.iconsMaterialsLoaded && icons.length === 0) {
-        placeIcons()
-    }
-
-
     if (isOrbitControl) {
         controls.update();
         controls.target.y = camera.position.y
     }
-
 
     const elapsedTime = clock.getElapsedTime()
     shaderMaterial.uniforms.uTime = elapsedTime
@@ -460,13 +420,6 @@ function animate() {
     requestAnimationFrame(animate);
 }
 
-
-const placeIcons = () => {
-    for (let i = 0; i < window.iconsMaterials.length; i++) {
-        icons[i] = new Icon(i)
-    }
-    console.log('placedIcons', icons)
-}
 ///////////////////////////////////////////////////////////////////////////////////
 
 function fitCamera(camera, contWidth, contHeight) {
