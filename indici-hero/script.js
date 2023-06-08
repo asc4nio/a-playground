@@ -6,33 +6,31 @@
  */
 
 import * as THREE from 'three';
-import gsap from "gsap"
-import * as dat from 'dat.gui';
-
-
-
 import { OrbitControls } from '../lib/three.js/examples/jsm/controls/OrbitControls.js';
-
 // import { EffectComposer } from '../lib/three.js/examples/jsm/postprocessing/EffectComposer.js';
 // import { RenderPass } from '../lib/three.js/examples/jsm/postprocessing/RenderPass.js';
 // import { ShaderPass } from '../lib/three.js/examples/jsm/postprocessing/ShaderPass.js';
 
+import gsap from "gsap"
+import * as dat from 'dat.gui';
+
+
 let container, contRatio, camera, scene, renderer, controls, clock
 const gui = new dat.GUI();
-
-
-let shaderMaterial
 
 var isMobile = false;
 var antialias = true;
 const isOrbitControl = true
 
 
-const planeAspectRatio = 1
+let shaderMaterial
+
+const fitCameraAspectRatio = 1
 const fov = 35
 
 const params = {
-    camYpos: 1.75
+    camYpos: 1.75,
+    animateCamera: () => { gsap.to(params, { camYpos: 0, duration: 4 }) }
 };
 
 
@@ -130,15 +128,22 @@ class Deco {
 }
 
 
+
+///////////////////////////////////////////////////////////////////////////////////
+
+
 function init() {
-
-
     clock = new THREE.Clock()
+    const checkIfMobile = (() => {
+        var n = navigator.userAgent;
+        if (n.match(/Android/i) || n.match(/webOS/i) || n.match(/iPhone/i) || n.match(/iPad/i) || n.match(/iPod/i) || n.match(/BlackBerry/i) || n.match(/Windows Phone/i)) { isMobile = true; antialias = false; }
+        console.log('isMobile', isMobile)
+    })()
     const loader = new THREE.TextureLoader();
 
-    var n = navigator.userAgent;
-    if (n.match(/Android/i) || n.match(/webOS/i) || n.match(/iPhone/i) || n.match(/iPad/i) || n.match(/iPod/i) || n.match(/BlackBerry/i) || n.match(/Windows Phone/i)) { isMobile = true; antialias = false; }
-    console.log('isMobile', isMobile)
+    // SCENE
+    scene = new THREE.Scene();
+    scene.add(new THREE.GridHelper(4, 12, 0x888888, 0x444444)); //helper
 
     container = document.querySelector('#threejs')
     console.log(container.offsetWidth, container.offsetHeight)
@@ -149,9 +154,6 @@ function init() {
     camera.position.set(0, params.camYpos, 5);
     fitCamera(camera, container.offsetWidth, container.offsetHeight);
 
-    // SCENE
-    scene = new THREE.Scene();
-    scene.add(new THREE.GridHelper(4, 12, 0x888888, 0x444444)); //helper
 
     // RENDERER
     renderer = new THREE.WebGLRenderer({ antialias: antialias });
@@ -182,162 +184,185 @@ function init() {
         controls.update();
     }
 
+    const setBackgroundPanel = (() => {
+        let bgTexture = loader.load(bgTextureURL);
 
-    let bgTexture = loader.load(bgTextureURL);
-
-    shaderMaterial = new THREE.RawShaderMaterial({
-        vertexShader: `
-            uniform mat4 projectionMatrix;
-            uniform mat4 viewMatrix;
-            uniform mat4 modelMatrix;
-
-            attribute vec3 position;
-            attribute vec2 uv;
-
-            varying vec2 vUv;
-
-
-            void main()
-            {
-                //gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);
-
-                vec4 modelPosition = modelMatrix * vec4(position, 1.0);
-                vec4 viewPosition = viewMatrix * modelPosition;
-                vec4 projectedPosition = projectionMatrix * viewPosition;
-
-                gl_Position = projectedPosition;
-
-                vUv = uv;
+        shaderMaterial = new THREE.RawShaderMaterial({
+            vertexShader: `
+                uniform mat4 projectionMatrix;
+                uniform mat4 viewMatrix;
+                uniform mat4 modelMatrix;
+    
+                attribute vec3 position;
+                attribute vec2 uv;
+    
+                varying vec2 vUv;
+    
+    
+                void main()
+                {
+                    //gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);
+    
+                    vec4 modelPosition = modelMatrix * vec4(position, 1.0);
+                    vec4 viewPosition = viewMatrix * modelPosition;
+                    vec4 projectedPosition = projectionMatrix * viewPosition;
+    
+                    gl_Position = projectedPosition;
+    
+                    vUv = uv;
+    
+                }
+                `,
+            fragmentShader: `
+                precision mediump float;
+    
+                uniform float uTime;
+                uniform vec3 colorA;
+    
+                uniform sampler2D uTexture;
+    
+                varying vec2 vUv;
+    
+    
+                //
+                //	Classic Perlin 2D Noise 
+                //	by Stefan Gustavson
+                //
+                vec4 permute(vec4 x)
+                {
+                    return mod(((x*34.0)+1.0)*x, 289.0);
+                }
+    
+                vec2 fade(vec2 t) {return t*t*t*(t*(t*6.0-15.0)+10.0);}
+    
+                float cnoise(vec2 P){
+                    vec4 Pi = floor(P.xyxy) + vec4(0.0, 0.0, 1.0, 1.0);
+                    vec4 Pf = fract(P.xyxy) - vec4(0.0, 0.0, 1.0, 1.0);
+                    Pi = mod(Pi, 289.0); // To avoid truncation effects in permutation
+                    vec4 ix = Pi.xzxz;
+                    vec4 iy = Pi.yyww;
+                    vec4 fx = Pf.xzxz;
+                    vec4 fy = Pf.yyww;
+                    vec4 i = permute(permute(ix) + iy);
+                    vec4 gx = 2.0 * fract(i * 0.0243902439) - 1.0; // 1/41 = 0.024...
+                    vec4 gy = abs(gx) - 0.5;
+                    vec4 tx = floor(gx + 0.5);
+                    gx = gx - tx;
+                    vec2 g00 = vec2(gx.x,gy.x);
+                    vec2 g10 = vec2(gx.y,gy.y);
+                    vec2 g01 = vec2(gx.z,gy.z);
+                    vec2 g11 = vec2(gx.w,gy.w);
+                    vec4 norm = 1.79284291400159 - 0.85373472095314 * 
+                        vec4(dot(g00, g00), dot(g01, g01), dot(g10, g10), dot(g11, g11));
+                    g00 *= norm.x;
+                    g01 *= norm.y;
+                    g10 *= norm.z;
+                    g11 *= norm.w;
+                    float n00 = dot(g00, vec2(fx.x, fy.x));
+                    float n10 = dot(g10, vec2(fx.y, fy.y));
+                    float n01 = dot(g01, vec2(fx.z, fy.z));
+                    float n11 = dot(g11, vec2(fx.w, fy.w));
+                    vec2 fade_xy = fade(Pf.xy);
+                    vec2 n_x = mix(vec2(n00, n01), vec2(n10, n11), fade_xy.x);
+                    float n_xy = mix(n_x.x, n_x.y, fade_xy.y);
+                    return 2.3 * n_xy;
+                }
+                //
+    
+    
+                void main()
+                {
+                    //vec4 textureColor = texture2D(uTexture, vUv);
+                    
+                    //gl_FragColor = textureColor;
+                    //gl_FragColor = vec4(vUv.x, vUv.y, 1.0, 1.0);
+    
+                    vec3 colorRed = vec3(0.725,0.016,0.42);
+                    vec3 colorBlue = vec3(0.506,0.012,0.89);
+    
+    
+                    float gridWidth = 0.97;
+                    float gridSize = 20.0;
+                    float grid = step(gridWidth, mod(vUv.y*gridSize, 1.0));
+                    grid += step(gridWidth, mod(vUv.x*gridSize, 1.0));
+    
+                    float noise = cnoise(vUv*50.0);
+                    grid *= noise+0.5;
+                    grid = clamp(grid, 0.0, 1.0);
+    
+    
+                    vec2 wavedUv = vec2(vUv.x, vUv.y + sin(vUv.x*5.0)*0.1);
+    
+                    // float bgGradient = vUv.y;
+                    float bgGradient = sin(wavedUv.y*5.0) +1.0 /2.0;
+    
+                    vec3 mixedColors = mix(colorRed, colorBlue, bgGradient);
+    
+                    vec3 result = mixedColors + grid*0.3 ;
+    
+    
+                    gl_FragColor = vec4(result, 1.0);
+                    // gl_FragColor = vec4(noise,noise,noise, 1.0);
+    
+    
+    
+                }
+            
+                `,
+            uniforms: {
+                uTime: { value: 0 },
+                uTexture: { value: bgTexture },
+                colorB: { value: new THREE.Color(0x0000FF) },
+                colorA: { value: new THREE.Color(0xFF00FF) }
 
             }
-            `,
-        fragmentShader: `
-            precision mediump float;
+        })
 
-            uniform float uTime;
-            uniform vec3 colorA;
+        let bgSize = 20
+        const bgGeometry = new THREE.PlaneGeometry(bgSize, bgSize);
+        const bgPlane = new THREE.Mesh(bgGeometry, shaderMaterial);
+        bgPlane.position.set(0, camera.position.y, -20)
+        scene.add(bgPlane);
 
-            uniform sampler2D uTexture;
+    })()
 
-            varying vec2 vUv;
+    const setObjects = (() => {
+        // init icons
+        for (let i = 0; i < iconsTextures.length; i++) {
 
-
-            //
-            //	Classic Perlin 2D Noise 
-            //	by Stefan Gustavson
-            //
-            vec4 permute(vec4 x)
-            {
-                return mod(((x*34.0)+1.0)*x, 289.0);
-            }
-
-            vec2 fade(vec2 t) {return t*t*t*(t*(t*6.0-15.0)+10.0);}
-
-            float cnoise(vec2 P){
-                vec4 Pi = floor(P.xyxy) + vec4(0.0, 0.0, 1.0, 1.0);
-                vec4 Pf = fract(P.xyxy) - vec4(0.0, 0.0, 1.0, 1.0);
-                Pi = mod(Pi, 289.0); // To avoid truncation effects in permutation
-                vec4 ix = Pi.xzxz;
-                vec4 iy = Pi.yyww;
-                vec4 fx = Pf.xzxz;
-                vec4 fy = Pf.yyww;
-                vec4 i = permute(permute(ix) + iy);
-                vec4 gx = 2.0 * fract(i * 0.0243902439) - 1.0; // 1/41 = 0.024...
-                vec4 gy = abs(gx) - 0.5;
-                vec4 tx = floor(gx + 0.5);
-                gx = gx - tx;
-                vec2 g00 = vec2(gx.x,gy.x);
-                vec2 g10 = vec2(gx.y,gy.y);
-                vec2 g01 = vec2(gx.z,gy.z);
-                vec2 g11 = vec2(gx.w,gy.w);
-                vec4 norm = 1.79284291400159 - 0.85373472095314 * 
-                    vec4(dot(g00, g00), dot(g01, g01), dot(g10, g10), dot(g11, g11));
-                g00 *= norm.x;
-                g01 *= norm.y;
-                g10 *= norm.z;
-                g11 *= norm.w;
-                float n00 = dot(g00, vec2(fx.x, fy.x));
-                float n10 = dot(g10, vec2(fx.y, fy.y));
-                float n01 = dot(g01, vec2(fx.z, fy.z));
-                float n11 = dot(g11, vec2(fx.w, fy.w));
-                vec2 fade_xy = fade(Pf.xy);
-                vec2 n_x = mix(vec2(n00, n01), vec2(n10, n11), fade_xy.x);
-                float n_xy = mix(n_x.x, n_x.y, fade_xy.y);
-                return 2.3 * n_xy;
-            }
-            //
-
-
-            void main()
-            {
-                //vec4 textureColor = texture2D(uTexture, vUv);
-                
-                //gl_FragColor = textureColor;
-                //gl_FragColor = vec4(vUv.x, vUv.y, 1.0, 1.0);
-
-                vec3 colorRed = vec3(0.725,0.016,0.42);
-                vec3 colorBlue = vec3(0.506,0.012,0.89);
-
-
-                float gridWidth = 0.97;
-                float gridSize = 20.0;
-                float grid = step(gridWidth, mod(vUv.y*gridSize, 1.0));
-                grid += step(gridWidth, mod(vUv.x*gridSize, 1.0));
-
-                float noise = cnoise(vUv*50.0);
-                grid *= noise+0.5;
-                grid = clamp(grid, 0.0, 1.0);
-
-
-                vec2 wavedUv = vec2(vUv.x, vUv.y + sin(vUv.x*5.0)*0.1);
-
-                // float bgGradient = vUv.y;
-                float bgGradient = sin(wavedUv.y*5.0) +1.0 /2.0;
-
-                vec3 mixedColors = mix(colorRed, colorBlue, bgGradient);
-
-                vec3 result = mixedColors + grid*0.3 ;
-
-
-                gl_FragColor = vec4(result, 1.0);
-                // gl_FragColor = vec4(noise,noise,noise, 1.0);
-
-
-
-            }
-        
-            `,
-        uniforms: {
-            uTime: { value: 0 },
-            uTexture: { value: bgTexture },
-            colorB: { value: new THREE.Color(0x0000FF) },
-            colorA: { value: new THREE.Color(0xFF00FF) }
+            loader.load(
+                iconsTextures[i],
+                // onLoad callback
+                function (texture) {
+                    iconsMaterials[i] = new THREE.MeshBasicMaterial({
+                        map: texture,
+                        transparent: true,
+                    });
+                    icons[i] = new Icon(i)
+                },
+                // onProgress callback currently not supported
+                undefined,
+                // onError callback
+                function (err) {
+                    console.error('An error happened.');
+                }
+            );
 
         }
-    })
 
-    let bgSize = 20
-    const bgGeometry = new THREE.PlaneGeometry(bgSize, bgSize);
-    const bgPlane = new THREE.Mesh(bgGeometry, shaderMaterial);
-    bgPlane.position.set(0, camera.position.y, -20)
-    scene.add(bgPlane);
-
-
-
-    // init objects
-    for (let i = 0; i < iconsTextures.length; i++) {
-
-        loader.load(
-            // resource URL
-            iconsTextures[i],
+        // init decos
+        const decoTexture = loader.load(
+            decoTextureURL,
             // onLoad callback
             function (texture) {
-                // in this example we create the material when the texture is loaded
-                iconsMaterials[i] = new THREE.MeshBasicMaterial({
+                decoMaterial = new THREE.MeshBasicMaterial({
                     map: texture,
                     transparent: true,
                 });
-                icons[i] = new Icon(i)
+
+                for (let i = 0; i < decoQuantity; i++) {
+                    decos[i] = new Deco
+                }
             },
             // onProgress callback currently not supported
             undefined,
@@ -347,43 +372,13 @@ function init() {
             }
         );
 
-
-    }
-
-
-    const decoTexture = loader.load(
-        // resource URL
-        decoTextureURL,
-        // onLoad callback
-        function (texture) {
-            // in this example we create the material when the texture is loaded
-            decoMaterial = new THREE.MeshBasicMaterial({
-                map: texture,
-                transparent: true,
-            });
-
-            for (let i = 0; i < decoQuantity; i++) {
-                decos[i] = new Deco
-            }
-        },
-        // onProgress callback currently not supported
-        undefined,
-        // onError callback
-        function (err) {
-            console.error('An error happened.');
-        }
-    );
-
-
-
+    })()
 
 
     // gui
     gui.add(params, 'camYpos', 0, 1.75, 0.0001);
+    gui.add(params, 'animateCamera');
     gui.open();
-
-    var obj = { animateCamera: function () { gsap.to(params, { camYpos: 0, duration: 4 }) } };
-    gui.add(obj, 'animateCamera');
 
 
     // const composer = new EffectComposer(renderer);
@@ -393,6 +388,7 @@ function init() {
     // pass.renderToScreen = true;
     // composer.addPass(pass);
 
+    animate();
 }
 
 
@@ -409,9 +405,6 @@ function animate() {
     // console.log(shaderMaterial.uniforms.uTime)
 
 
-    renderer.render(scene, camera);
-
-
     for (let icon of icons) {
         icon.rotate()
     }
@@ -422,18 +415,21 @@ function animate() {
     //gui update
     camera.position.y = params.camYpos
 
-    requestAnimationFrame(animate);
 
+    renderer.render(scene, camera);
+    requestAnimationFrame(animate);
 }
+
+///////////////////////////////////////////////////////////////////////////////////
 
 function fitCamera(camera, contWidth, contHeight) {
     console.log('fitCamera')
     camera.aspect = contWidth / contHeight;
 
-    if (camera.aspect > planeAspectRatio) {
+    if (camera.aspect > fitCameraAspectRatio) {
         // window too large
         const cameraHeight = Math.tan(THREE.MathUtils.degToRad(fov / 2));
-        const ratio = camera.aspect / planeAspectRatio;
+        const ratio = camera.aspect / fitCameraAspectRatio;
         const newCameraHeight = cameraHeight / ratio;
         camera.fov = THREE.MathUtils.radToDeg(Math.atan(newCameraHeight)) * 2;
     } else {
@@ -454,5 +450,7 @@ function onWindowResize() {
 window.addEventListener('resize', onWindowResize);
 
 
+///////////////////////////////////////////////////////////////////////////////////
+
+
 init();
-animate();
